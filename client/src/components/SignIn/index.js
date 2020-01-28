@@ -70,8 +70,8 @@ function SignIn() {
                     </Link>
                   </Grid>
                   <Grid item>
-                    <Link href="#" variant="body2">
-                      {"Don't have an account? Sign Up"}
+                    <Link component={RouterLink} to={ROUTES.SIGN_UP} variant="body2">
+                      Don't have an account? Sign Up?
                     </Link>
                   </Grid>
                 </Grid>

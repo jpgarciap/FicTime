@@ -1,13 +1,16 @@
 import React from 'react';
 import firebase from 'firebase';
 import Navigation from '../src/components/Navigation';
+import Footer from '../src/components/Footer';
 import SignInPage from '../src/components/SignIn';
 import PasswordForgetPage from '../src/components/PasswordForget';
-import injectTapEventPlugin from 'react-tap-event-plugin';
+import SignUpPage from '../src/components/SignUp';
+//import injectTapEventPlugin from 'react-tap-event-plugin';
 import { BrowserRouter as Router,
     Route,
 } from 'react-router-dom';
 import * as ROUTES from '../src/constants/routes';
+import * as COLORS from '../src/constants/colors';
 
 
 const firebaseConfig = {
@@ -28,13 +31,12 @@ function App(){
   return (
     <body id="page-top">
       <Router>
-        <div>
+        <div style={{backgroundColor: COLORS.NEUTRAL}}>
           <Navigation />
-          <hr />
           <Route path={ROUTES.SIGN_IN} component={SignInPage}/>
           <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage}/>
+          <Route path={ROUTES.SIGN_UP} component={SignUpPage}/>
         </div>
-        
       </Router>
     </body>
   )
