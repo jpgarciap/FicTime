@@ -5,6 +5,7 @@ import Footer from '../src/components/Footer';
 import SignInPage from '../src/components/SignIn';
 import PasswordForgetPage from '../src/components/PasswordForget';
 import SignUpPage from '../src/components/SignUp';
+import HomePage from '../src/components/Home';
 //import injectTapEventPlugin from 'react-tap-event-plugin';
 import { BrowserRouter as Router,
     Route,
@@ -33,6 +34,7 @@ function App(){
       <Router>
         <div style={{backgroundColor: COLORS.NEUTRAL}}>
           <Navigation />
+          <Route path={ROUTES.HOME} component={HomePage}/>
           <Route path={ROUTES.SIGN_IN} component={SignInPage}/>
           <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage}/>
           <Route path={ROUTES.SIGN_UP} component={SignUpPage}/>
