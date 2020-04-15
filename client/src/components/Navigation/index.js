@@ -1,41 +1,39 @@
-/*import React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
-import * as ROUTES from '../../constants/routes';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import * as COLORS from '../../constants/colors';
-import IconButton from 'material-ui/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import Typography from '@material-ui/core/Typography';
-*/
-
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import * as COLORS from '../../constants/colors';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
+import { AuthContext } from '../Firebase/context';
+import app from '../Firebase/firebase';
+import AdminSlide from './adminslide';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
       flexGrow: 1,
     },
     title: {
-      flexGrow: 1,
+      marginRight: theme.spacing(2),
+    },
+    adminmode: {
+      //flexGrow: 1,
     },
   }),
 );
 
 export default function Navigation() {
   const classes = useStyles();
+
+  const { currentUser } = useContext(AuthContext);
+  
+  function logout() {
+    app.auth().signOut();
+  }
+
 
   return (
     <div className={classes.root}>
@@ -46,29 +44,12 @@ export default function Navigation() {
               FicTime
             </Link>
           </Typography>
-          <Button component={ Link } to={ROUTES.SIGN_IN} style={{color: COLORS.CARBON}}>Login</Button>
+          <AdminSlide className={classes.adminmode}></AdminSlide>
+          { currentUser ? <Button component={ Link } to={ROUTES.LANDING} onClick={logout} style={{color: COLORS.CARBON}}>Sign Out</Button> 
+          : <Button component={ Link } to={ROUTES.SIGN_IN} style={{color: COLORS.CARBON}}>Login</Button>}
+          }
         </Toolbar>
       </AppBar>
     </div>
   );
 }
-
-/*<img src="logo_horizontal.png" alt="logo" />*/
-/*
-function Navigation() {
-  const styles = useStyles();
-    return (
-      <div className={styles.root}>
-        <AppBar position="static" style={{backgroundColor: 'white'}}>
-          <Toolbar>
-            <img src="logo_horizontal.png" alt="logo" className={styles.title} />
-            <Button component={ Link } to={ROUTES.SIGN_IN} color={COLORS.CARBON}>Login</Button>
-          </Toolbar>
-        </AppBar>
-      </div>
-    );
-  }
-*/
-//<Typography variant="h5" color={COLORS.WATERMELON} className={styles.title}>
-//<Link to={ROUTES.LANDING} color="inherit">FicRegister</Link>
-//</Typography>

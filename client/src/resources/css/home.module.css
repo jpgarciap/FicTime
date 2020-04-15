@@ -1,0 +1,38 @@
+html, #app, #app>div {
+  height: 100%
+}
+
+body {
+  height:100vh;
+  background-color: #EFEFEF;
+}
+
+.wrapper {
+  background-color: #EFEFEF;
+  height:100vh;
+  margin: 0 auto -80px; /* footer height + space */
+  min-height: 100%;
+  padding: 0 0 80px; /* footer height + space */
+  box-sizing: border-box;
+  overflow: auto;
+}
+.footer {
+  background-color: white;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+  text-align: center;
+}
+
+.logo {
+  max-width:100%;
+  height:auto;
+  width: 20%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+

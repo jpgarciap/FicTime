@@ -1,25 +1,13 @@
 import React from 'react';
-import logo from '../../resources/logo_horizontal.png';
-import '../../resources/css/home.css';
+import logo from '../../resources/logos/logo.png';
+import styles from '../../resources/css/home.module.css';
 
 function Home() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <img src={logo} className={styles.logo} alt="logo" />
       </header>
-        <i class="access_alarm">add</i>
     </div>
   );
 }

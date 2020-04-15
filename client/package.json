@@ -3,25 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^4.8.3",
-    "@material-ui/icons": "^4.5.1",
-    "firebase": "^7.6.2",
+    "@material-ui/core": "^4.9.9",
+    "@material-ui/icons": "^4.9.1",
+    "babel": "^6.23.0",
+    "firebase": "^7.12.0",
     "font-awesome": "^4.7.0",
+    "ios-switch-material-ui": "^3.3.0",
     "material-ui": "^0.20.2",
-    "materialize-css": "^1.0.0-rc.2",
-    "react": "^16.10.1",
-    "react-dom": "^16.10.1",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "^3.3.0",
-    "react-tap-event-plugin": "^3.0.3",
-    "typescript": "^3.7.5"
+    "materialize-css": "^1.0.0",
+    "node-sass": "^4.13.1",
+    "nodemon": "^2.0.3",
+    "react": "^16.13.1",
+    "react-admin": "^3.x",
+    "react-admin-firebase": "^3.1.3",
+    "react-dev-utils": "^10.2.1",
+    "react-dom": "^16.13.1",
+    "react-places-autocomplete": "^7.2.1",
+    "react-scripts": "^3.4.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "webpack": "webpack --mode development"
+    "dev": "nodemon /src/index.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -39,6 +44,14 @@
     ]
   },
   "devDependencies": {
-    "webpack-cli": "^3.3.9"
+    "admin-on-rest": "^1.4.1",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.1.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^3.5.2",
+    "dotenv": "^8.2.0",
+    "file-loader": "^5.1.0",
+    "style-loader": "^1.1.3"
   }
 }
