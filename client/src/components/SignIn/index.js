@@ -17,7 +17,7 @@ import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { compose } from 'recompose';
 import { withRouter } from 'react-router';
-import app from '../Firebase/firebase';
+import { app } from '../Firebase/firebase';
 
 const styles = Utils.formStyles;
 

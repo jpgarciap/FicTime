@@ -8,7 +8,7 @@ export default class PlaceAutocomplete extends React.Component{
         super(props);
 
         this.state = {
-            location: '',
+            location: this.props.record.location ? this.props.record.location : "",
             coordinates: {
                 lat: null,
                 lng: null

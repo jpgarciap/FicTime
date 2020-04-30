@@ -8,7 +8,7 @@ import * as Utils from '../../constants/utils';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { compose } from 'recompose';
-import { createAccount } from '../../actions/AccountApi';
+import { requestAccount } from '../../actions/AccountApi';
 
 
 const INITIAL_STATE = {
@@ -33,7 +33,7 @@ class SignUpForm extends React.Component {
 
   onSubmit = event => {
     event.preventDefault();
-    createAccount(this.state);  
+    requestAccount(this.state);  
   };
 
 

@@ -20,7 +20,7 @@ class App extends Component{
           <Router>
             <div className={styles.wrapper}>
               <Navigation />
-              {/* <PrivateRoute path={ROUTES.LANDING} component={HomePage}/> */}
+              <Route exact path={ROUTES.LANDING} component={HomePage}/>
               <Route path={ROUTES.HOME} component={HomePage}/>
               <Route path={ROUTES.SIGN_IN} component={SignInPage}/>
               <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage}/>

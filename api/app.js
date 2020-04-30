@@ -4,14 +4,13 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/user.route');
 var officeRouter = require('./routes/office.route');
 var historicalRouter = require('./routes/historical.route');
 var turnRouter = require('./routes/turn.route');
 var accountRouter = require('./routes/account.route');
 
-const { mongoose } = require('./database');
 var app = express();
+var adminRouter = require('./routes/admin.route');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,7 +32,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/user', usersRouter);
+app.use('/users', adminRouter);
 app.use('/office', officeRouter);
 app.use('/turn', turnRouter);
 app.use('/historical', historicalRouter);

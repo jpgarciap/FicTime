@@ -1,9 +1,11 @@
 import React from 'react';
-
-import { Admin, Resource, ListGuesser } from 'react-admin';
+import { Admin, Resource } from 'react-admin';
 import { FirebaseDataProvider } from 'react-admin-firebase';
 import accounts from './accounts';
 import offices from './offices';
+import turns from './turns';
+import users from './users';
+import historicals from './historicals';
 
 var createHistory = require("history").createBrowserHistory;
 
@@ -30,8 +32,9 @@ class Dashboard extends React.Component {
     <Admin dataProvider={dataProvider} history={history}>
         <Resource name="accounts" {...accounts}/>
         <Resource name="offices" {...offices}/>
-        <Resource name="turns" list={ListGuesser}/>
-        <Resource name="users" list={ListGuesser}/>
+        <Resource name="turns" {...turns}/>
+        <Resource name="users" {...users}/>
+        <Resource name="historicals" {...historicals}/>
     </Admin>
     )
   }

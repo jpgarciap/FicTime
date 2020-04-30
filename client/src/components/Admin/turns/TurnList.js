@@ -1,13 +1,14 @@
 import React from 'react';
 import { List, Datagrid, TextField } from 'react-admin';
 
-const OfficesList = props => (
+const TurnList = props => (
     <List {...props} bulkActionButtons={false}>
         <Datagrid rowClick="edit">
             <TextField source="name" />
-            <TextField source="location" />
+            <TextField source="startTime" />
+            <TextField source="endTime" />
         </Datagrid>
     </List>
 );
 
-export default OfficesList;
+export default TurnList;

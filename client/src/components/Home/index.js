@@ -1,13 +1,16 @@
-import React from 'react';
-import logo from '../../resources/logos/logo.png';
-import styles from '../../resources/css/home.module.css';
+import React, { useContext } from 'react';
+import { AuthContext } from '../Firebase/context';
+import Welcome from './Welcome';
+import RegistTime from './RegistTime';
 
 function Home() {
+  const { currentUser } = useContext(AuthContext);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className={styles.logo} alt="logo" />
-      </header>
+    <div>
+      { currentUser ? 
+        <RegistTime email={currentUser.email} /> 
+      :  <Welcome/> }
     </div>
   );
 }

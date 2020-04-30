@@ -1,6 +1,5 @@
-import app from '../components/Firebase/firebase'
-import 'firebase/database';
+import { app } from '../components/Firebase/firebase'
 
-export function createAccount(data) {
+export function requestAccount(data) {
     app.firestore().collection('accounts').add(data);
 }

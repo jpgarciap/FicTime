@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import * as Utils from '../../constants/utils';
 import { withRouter} from 'react-router';
-import app from '../Firebase/firebase';
+import { app } from '../Firebase/firebase';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { compose } from 'recompose';
