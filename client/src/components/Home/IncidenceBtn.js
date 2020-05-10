@@ -22,10 +22,16 @@ class IncidenceBtnBase extends React.Component {
         super(props);
         this.state = { 
             open: false,
-            date: "",
+            date: this.getTodayDateformat(),
             type: "Start",
             hour: "07:30"
         };
+    }
+
+    getTodayDateformat() {
+        var today = new Date();
+        function pad(s) { return (s < 10) ? '0' + s : s; }
+        return [today.getFullYear(), pad(today.getMonth()+1), pad(today.getDate())].join('-')
     }
 
     handleClickOpen = () => {
@@ -41,21 +47,67 @@ class IncidenceBtnBase extends React.Component {
     };
 
     handleRegist = () => {
-
-        //TODO sin implementar
-        // var dateToRegist = new Date(this.state.date);
-        // app.firestore().collection('historicals')
-        // .where('user', '==', this.props.userDocId)
-        // .where('date', '==', dateToRegist)
-        // .limit(1)
-        // .get();
-
-        console.log("jpjp click " + JSON.stringify(this.state));
-
-        this.setState({
-            open: false
-        })
+        var dateToRegist = new Date(this.state.date);
+        app.firestore().collection('historicals')
+        .where('user', '==', this.props.userDocId)
+        .where('date', '==', dateToRegist)
+        .limit(1)
+        .get()
+        .then(historicalDocs => {
+            if (historicalDocs.size === 1){
+                this.updateHistorical(historicalDocs.docs[0]);                
+            } else {
+                this.addHistorical();
+            }
+        });
     };
+
+    updateHistorical (historical) {
+        var data = historical.data();
+        var canRegistStart = this.state.type === "Start" && data.start == null;
+        var canRegistEnd = this.state.type === "End" && data.end == null;
+        if (canRegistStart){
+            this.updateEntry(historical.id, {start: this.state.hour })
+        } else if (canRegistEnd){
+            this.updateEntry(historical.id, {end: this.state.hour })
+        } else {
+            alert("Ya tiene un registro para este dia")
+        }
+    }
+
+    updateEntry(historicalId, data){
+        var historicalDoc = app.firestore().collection('historicals').doc(historicalId);
+
+        historicalDoc.update(data)
+        .then(function() {
+          console.log("Document successfully updated!");
+          window.location.reload();
+        })
+        .catch(function(error) {
+          console.error("Error updating document: ", error);
+        });
+    }
+
+    addHistorical () {
+        var historical = {
+            date: new Date(this.state.date),
+            user: this.props.userDocId
+        };
+        if (this.state.type === "Start") {
+            historical["start"] = this.state.hour;
+        } else {
+            historical["end"] = this.state.hour;
+        }
+
+        app.firestore().collection('historicals').add(historical)
+            .then(function(docRef) {
+              window.location.reload();
+
+            })
+          .catch(function(error) {
+            console.error("Error adding document: ", error);
+          });
+    }
 
     onChange = event => {
         this.setState({
@@ -66,7 +118,7 @@ class IncidenceBtnBase extends React.Component {
     render() {
         const { classes } = this.props;
         const { open } = this.state;
-
+        const today = new Date();
         return(
             <div>
                 <Button variant="contained" startIcon={<NotificationImportantRoundedIcon />} size="large" color="primary" onClick={this.handleClickOpen} className={classes.margin}>
@@ -77,13 +129,14 @@ class IncidenceBtnBase extends React.Component {
                     <DialogContent>
                         <form className={classes.container}>
                             <TextField
-                                id="date"
                                 label="Date"
                                 type="date"
-                                required
+                                maxdate={today}
                                 name="date"
+                                defaultValue={this.state.date}
                                 onChange={this.onChange}
                                 className={classes.textField}
+                                InputProps={{ inputProps: { max: this.state.date } }}
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
@@ -91,13 +144,11 @@ class IncidenceBtnBase extends React.Component {
                         </form>
                         <form className={classes.container}>
                             <TextField
-                                id="time"
                                 label="Hour"
                                 type="time"
-                                required
-                                name="time"
+                                name="hour"
                                 onChange={this.onChange}
-                                defaultValue="07:30"
+                                defaultValue={this.state.hour}
                                 className={classes.textField}
                                 InputLabelProps={{
                                 shrink: true,

@@ -15,6 +15,7 @@ import Paper from '@material-ui/core/Paper';
 import * as Utils from '../../constants/utils';
 import { compose } from 'recompose';
 import IncidenceBtn from './IncidenceBtn';
+import HistoricalBtn from './HistoricalBtn';
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
@@ -62,9 +63,10 @@ function getTime() {
 
 function getTodayDateformat() {
   var today = new Date();
-  return today.getFullYear() + '-' + today.getMonth() + '-' + today.getDate();
-
+  function pad(s) { return (s < 10) ? '0' + s : s; }
+  return [today.getFullYear(), pad(today.getMonth()+1), pad(today.getDate())].join('-')
 }
+
 class RegistTimeBase extends React.Component {
 
   constructor(props) {
@@ -101,7 +103,7 @@ class RegistTimeBase extends React.Component {
                 historicalDocs.forEach(historicalDoc => {
                     var data = historicalDoc.data();
 
-                    if (isToday(data.date.toDate())){
+                    if ((data.date != null) && isToday(data.date.toDate())){
                       actionBtns.disableStart = (data.start != null) || (data.end != null);
                       actionBtns.disableEnd = (data.end != null);
                       historicalTodayDocId = historicalDoc.id;
@@ -120,7 +122,6 @@ class RegistTimeBase extends React.Component {
   onStart = event => {
     const { userDocId, historicalTodayDocId } = this.state;
     var time = getTime();
-
     if (historicalTodayDocId == null){
       var historical = {
         date: new Date(getTodayDateformat()),
@@ -215,8 +216,10 @@ class RegistTimeBase extends React.Component {
                       </TableBody>
                   </Table>
               </TableContainer>
-
           </div>
+          <div>
+              <HistoricalBtn userDocId={this.state.userDocId}/>
+          </div>          
 
       </div>
     )

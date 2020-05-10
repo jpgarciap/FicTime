@@ -21,6 +21,17 @@ export const formStyles = theme => ({
   },
 });
 
+
+export const cardStyles = theme => ({
+  container: {
+    marginTop: theme.spacing(3),
+    display: 'flex',
+    flexWrap: 'wrap',
+    flexDirection: 'column',
+    alignItems: 'center',
+  }
+});
+
 export const tableStyles = theme => ({
   tableContainer: {
       marginTop: theme.spacing(5),
@@ -31,7 +42,7 @@ export const tableStyles = theme => ({
       maxWidth: 800,
   },
   table: {
-       minWidth: 700,
+      minWidth: 700,
       width: "25%"
   },
   margin: {
@@ -63,4 +74,18 @@ export const registIncidence = theme => ({
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
+});
+
+
+export const workShiftSelector = theme => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+  container: {
+    margin: theme.spacing(2),
+  }
 });

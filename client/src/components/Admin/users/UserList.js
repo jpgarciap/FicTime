@@ -19,7 +19,7 @@ const UserList = props => (
             <ReferenceField label="Office" source="office" reference="offices">
                 <TextField source="name" />
             </ReferenceField>
-            <ReferenceField label="Turn" source="turn" reference="turns">
+            <ReferenceField label="Work Shift" source="workShift" reference="workShifts">
                 <TextField source="name" />
             </ReferenceField>
             <BooleanField source="admin" />

@@ -3,9 +3,10 @@ import { Admin, Resource } from 'react-admin';
 import { FirebaseDataProvider } from 'react-admin-firebase';
 import accounts from './accounts';
 import offices from './offices';
-import turns from './turns';
+import workShifts from './workShifts';
 import users from './users';
 import historicals from './historicals';
+import Dashboard from './dashboard';
 
 var createHistory = require("history").createBrowserHistory;
 
@@ -25,14 +26,14 @@ const dataProvider = FirebaseDataProvider(config, options);
 
 const history = createHistory({ basename: '/admin' });
 
-class Dashboard extends React.Component {
+class AdminDashboard extends React.Component {
 
   render() {
     return (
-    <Admin dataProvider={dataProvider} history={history}>
+    <Admin dashboard={Dashboard} dataProvider={dataProvider} history={history}>
         <Resource name="accounts" {...accounts}/>
         <Resource name="offices" {...offices}/>
-        <Resource name="turns" {...turns}/>
+        <Resource name="workShifts" {...workShifts}/>
         <Resource name="users" {...users}/>
         <Resource name="historicals" {...historicals}/>
     </Admin>
@@ -41,4 +42,4 @@ class Dashboard extends React.Component {
 }
 
 
-export default Dashboard;
+export default AdminDashboard;

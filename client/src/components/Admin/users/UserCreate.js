@@ -11,7 +11,7 @@ const WorkData = () =>{
                     <SelectInput optionText="name" />
                 </ReferenceInput>
                 &nbsp;
-                <ReferenceInput label="Turn" source="turn" reference="turns">
+                <ReferenceInput label="Work Shift" source="workShift" reference="workShifts">
                     <SelectInput optionText="name" />
                 </ReferenceInput>            
             </span>      
