@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { AuthContext } from '../Firebase/context';
 import { app } from '../Firebase/firebase';
+import Grid from '@material-ui/core/Grid';
 import AdminSlide from './adminslide';
 
 const useStyles = makeStyles((theme) =>
@@ -40,14 +41,24 @@ export default function Navigation() {
     <div className={classes.root}>
       <AppBar position="static" style={{backgroundColor: 'white'}}>
         <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            <Link to={ROUTES.LANDING} style={{color: COLORS.CARBON}}>
-              FicTime
-            </Link>
-          </Typography>
-          {/* <AdminSlide className={classes.adminmode}></AdminSlide> */}
-          { currentUser ? 
-          <Button component={ Link } to={ROUTES.LANDING} onClick={logout} style={{color: COLORS.CARBON}}>Sign Out</Button> : <Button component={ Link } to={ROUTES.SIGN_IN} style={{color: COLORS.CARBON}}>Login</Button>}
+          <Grid justify="space-between" container>
+            <Grid item>
+              <div>
+                <Typography variant="h6" className={classes.title}>
+                  <Link to={ROUTES.LANDING} style={{color: COLORS.CARBON}}>
+                    FicTime
+                  </Link>
+                </Typography>
+              </div>
+            </Grid>
+            <Grid item>
+                <AdminSlide className={classes.adminmode}></AdminSlide>
+            </Grid>
+            <Grid item>
+              { currentUser ? 
+              <Button component={ Link } to={ROUTES.LANDING} onClick={logout} style={{color: COLORS.CARBON}}>Sign Out</Button> : <Button component={ Link } to={ROUTES.SIGN_IN} style={{color: COLORS.CARBON}}>Login</Button>}
+            </Grid>
+          </Grid>
         </Toolbar>
       </AppBar>
     </div>

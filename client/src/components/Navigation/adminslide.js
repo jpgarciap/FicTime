@@ -1,29 +1,57 @@
 import * as React from "react";
-import IosSwitchMaterialUi from "ios-switch-material-ui";
 import * as COLORS from '../../constants/colors';
+import * as ROUTES from '../../constants/routes';
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
+import PropTypes from 'prop-types' 
+import { withRouter } from 'react-router'
 
-class AdminSlide extends React.Component {
+
+class AdminSlideBase extends React.Component {
+
+    static propTypes = {
+        location: PropTypes.object.isRequired,
+        history: PropTypes.object.isRequired
+    }
+
+    constructor (props) {
+        super(props);
+        this.state = { 
+          checked: false
+        };
+    }
+
+    componentDidMount(){
+        this.setState({
+            checked : this.props.location.pathname.includes('admin')
+        });
+    }
+
+    handleChange = (event) => {
+        if (event.target.checked){
+            this.props.history.push(ROUTES.ADMIN);
+        } else{
+            this.props.history.push(ROUTES.LANDING);
+        }
+
+        this.setState({
+            [event.target.name] : event.target.checked
+        });
+    };
 
     render() {
+        const { location } = this.props
+        const checked = location.pathname.includes('admin') && this.state.checked;
         return (
-            <div>
-                <IosSwitchMaterialUi
-                    defaultKnobOnLeft="true"
-                    aspectRatio="4"
-                    colorKnobOnLeft={COLORS.CARBON}
-                    colorKnobOnRight={COLORS.WATERMELON}
-                    onChange={this.handleChange}
-                />
-                <Typography variant="h6">Admin</Typography>
-            </div>
+            <FormControlLabel
+            control={<Switch checked={checked} onChange={this.handleChange} name="checked"/>}
+            label={<Typography variant="h6" style={{color: COLORS.WATERMELON}}>Admin</Typography>}          />
         );
     }
-  
-    handleChange = (disable) => {
-        console.log("jpjp disable " + disable);
-    };
 }
+
+const AdminSlide = withRouter(AdminSlideBase)
 
 export default AdminSlide;
 

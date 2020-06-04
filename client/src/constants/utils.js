@@ -21,16 +21,17 @@ export const formStyles = theme => ({
   },
 });
 
-
-export const cardStyles = theme => ({
-  container: {
-    marginTop: theme.spacing(3),
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexDirection: 'column',
-    alignItems: 'center',
-  }
+export const chartsStyles = theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  chart: {
+    padding: theme.spacing(10),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
 });
+
 
 export const tableStyles = theme => ({
   tableContainer: {
@@ -86,6 +87,6 @@ export const workShiftSelector = theme => ({
     marginTop: theme.spacing(2),
   },
   container: {
-    margin: theme.spacing(2),
+    margin: theme.spacing(4),
   }
 });

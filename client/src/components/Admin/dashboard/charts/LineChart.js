@@ -121,7 +121,7 @@ function convertDate(date) {
   return [pad(date.getDate()), pad(date.getMonth()+1), date.getFullYear()].join('/')
 }
 
-class LineCharBase extends Component {
+class LineChartBase extends Component {
 
   constructor (props) {
     super(props);
@@ -252,10 +252,7 @@ class LineCharBase extends Component {
 
   parseStringHourToNumber(stringHour) {
     var split = stringHour.split(':');
-    var result = parseFloat(split[0]) + parseFloat(split[1]/60);
-    console.log(stringHour);
-    console.log(result);
-    return result; 
+    return parseFloat(split[0]) + parseFloat(split[1]/60);
   }
 
   addOrUpdateData (accumulatedData, regist) {
@@ -309,8 +306,8 @@ class LineCharBase extends Component {
   }
 }
 
-LineCharBase.propTypes = {
+LineChartBase.propTypes = {
   classes: PropTypes.object.isRequired,
 }
-const LineChar = withStyles(styles) (LineCharBase);
+const LineChar = withStyles(styles) (LineChartBase);
 export default LineChar;
