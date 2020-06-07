@@ -31,12 +31,16 @@ const toolbarStyles = {
 const UserEditToolbar = withStyles(toolbarStyles) (props => (
     <Toolbar {...props}>
         <CustomSaveEdit label="Save" redirect="list" submitOnEnter={false} />
-        <CustomUserDelete label="DELETE" undoable={false} submitOnEnter={false}/>
+        <CustomUserDelete id={props.record.id} label="DELETE" undoable={false} submitOnEnter={false}/>
     </Toolbar>
 ))
 
+const UserTitle = ({ record }) => {
+    return <span>User {record ? `${record.name}` : ''}</span>;
+};
+
 const UserEdit = props => (
-    <Edit {...props}>
+    <Edit title={<UserTitle />} {...props}>
         <SimpleForm toolbar={<UserEditToolbar />}>
             <TextInput source="email" disabled/>
             <TextInput source="name" validate={required()}/>

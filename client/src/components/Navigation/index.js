@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import * as COLORS from '../../constants/colors';
@@ -29,8 +29,22 @@ const useStyles = makeStyles((theme) =>
 
 export default function Navigation() {
   const classes = useStyles();
+  const [isAdmin, setIsAdmin] = useState(null);
 
   const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (currentUser) {
+      currentUser.getIdTokenResult()
+      .then((idTokenResult) => {
+        if (!!idTokenResult.claims.admin) {
+          setIsAdmin(true);
+        }
+      }).catch((error) => {
+        console.log(error);
+      })
+    }
+  }, [currentUser]);
   
   function logout() {
     app.auth().signOut();
@@ -52,7 +66,7 @@ export default function Navigation() {
               </div>
             </Grid>
             <Grid item>
-                <AdminSlide className={classes.adminmode}></AdminSlide>
+                { isAdmin ? <AdminSlide className={classes.adminmode}></AdminSlide> : null}                
             </Grid>
             <Grid item>
               { currentUser ? 

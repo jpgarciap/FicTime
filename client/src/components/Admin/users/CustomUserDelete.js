@@ -8,11 +8,13 @@ const CustomUserDelete = ({ ...props }) => {
 
     const handleClick = useCallback(() => {
         const email = form.getFieldState('email').value;
-        axios.delete(`http://localhost:9000/users/delete/${email}`, {})
+        const id = props.id;
+        axios.delete(`http://localhost:9000/users/delete/${email}/${id}`, {})
 
-    }, [form]);
+    }, [form, props.id]);
 
     return <DeleteButton {...props} onClick={handleClick} />;
+
 };
 
 export default CustomUserDelete;

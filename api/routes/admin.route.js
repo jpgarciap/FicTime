@@ -3,7 +3,6 @@ var serviceAccount = require("../firebase/firebase-admin.json");
 var express = require('express');
 var router = express.Router();
 
-
 const FirebaseAdmin = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://registration-dc367.firebaseio.com"
@@ -27,10 +26,10 @@ router.post('/create', async (req, res, next) => {
 });
 
 //Borra un usuario 
-router.delete('/delete/:email', async (req, res, next) => {
+router.delete('/delete/:email/:id', async (req, res, next) => {
 
   const email = req.params.email;
-  console.log(req.params);
+  const userId = req.params.id;
   FirebaseAdmin.auth().getUserByEmail(email)
     .then(function(user){
       console.log(user);
@@ -39,7 +38,52 @@ router.delete('/delete/:email', async (req, res, next) => {
           res.status(200);
         });
     })  
+  
+    deleteHistoricals(FirebaseAdmin.firestore(), userId, 'historicals', 100);
 });
+
+
+function deleteHistoricals(db, userId, collectionPath, batchSize) {
+  let collectionRef = db.collection(collectionPath);
+  let query = collectionRef.where('user', '==', userId).limit(batchSize);
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(db, query, batchSize, resolve, reject);
+  });
+}
+
+function deleteQueryBatch(db, query, batchSize, resolve, reject) {
+  query.get()
+    .then((snapshot) => {
+      // When there are no documents left, we are done
+      if (snapshot.size == 0) {
+        return 0;
+      }
+
+      // Delete documents in a batch
+      let batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      return batch.commit().then(() => {
+        return snapshot.size;
+      });
+    }).then((numDeleted) => {
+      if (numDeleted === 0) {
+        resolve();
+        return;
+      }
+
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      process.nextTick(() => {
+        deleteQueryBatch(db, query, batchSize, resolve, reject);
+      });
+    })
+    .catch(reject);
+}
+
 
 //Actualiza permiso ADM
 router.put('/updateAdm/:email', async (req, res, next) => {

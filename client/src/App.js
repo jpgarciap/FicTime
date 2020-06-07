@@ -9,6 +9,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import * as ROUTES from '../src/constants/routes';
 import styles from './resources/css/home.module.css';
 import { AuthProvider } from '../src/components/Firebase/context';
+import RouteAdmin from '../src/components/Admin/RouteAdmin'
 
 
 class App extends Component{
@@ -25,7 +26,9 @@ class App extends Component{
               <Route path={ROUTES.SIGN_IN} component={SignInPage}/>
               <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage}/>
               <Route path={ROUTES.SIGN_UP} component={SignUpPage}/>
-              <Route path={ROUTES.ADMIN} component={Dashboard}/>
+              <RouteAdmin path={ROUTES.ADMIN}>
+                <Dashboard></Dashboard>  
+              </RouteAdmin>
             </div>
           </Router>
         </AuthProvider>

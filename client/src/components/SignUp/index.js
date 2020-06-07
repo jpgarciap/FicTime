@@ -8,7 +8,7 @@ import * as Utils from '../../constants/utils';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { compose } from 'recompose';
-import { requestAccount } from '../../actions/AccountApi';
+import { app } from '../Firebase/firebase'
 
 
 const INITIAL_STATE = {
@@ -33,7 +33,8 @@ class SignUpForm extends React.Component {
 
   onSubmit = event => {
     event.preventDefault();
-    requestAccount(this.state);  
+    app.firestore().collection('accounts').add(this.state);  
+    console.log('OK')
   };
 
 
@@ -44,7 +45,7 @@ class SignUpForm extends React.Component {
             <CssBaseline />
             <div className={classes.paper}>
               <Typography component="h1" variant="h5">
-                  You need to request an account
+                  First, request an account
               </Typography>
               <form className={classes.form} onSubmit={this.onSubmit}>
                 <TextField

@@ -90,3 +90,17 @@ export const workShiftSelector = theme => ({
     margin: theme.spacing(4),
   }
 });
+
+
+export const navigation = theme => ({ 
+    root: {
+      flexGrow: 1,
+    },
+  
+    title: {
+      marginRight: theme.spacing(2),
+    },
+    adminmode: {
+      flexGrow: 1,
+    },
+});
