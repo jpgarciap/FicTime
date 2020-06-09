@@ -9,6 +9,7 @@ import { app } from '../../../Firebase/firebase'
 import FindReplaceIcon from '@material-ui/icons/FindReplace';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import jsPDF from 'jspdf';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 
 const styles = Utils.workShiftSelector;
@@ -90,6 +91,7 @@ class BarsChartBase extends Component {
     constructor (props){
         super(props);
         this.state = {
+            loading: false,
             workShifts: [],
             barData: buildBarData([],[]),
             dougData: buildDougData(["None"], [100])
@@ -131,6 +133,7 @@ class BarsChartBase extends Component {
     }    
 
     calculateData = async () => {
+        this.setState({loading: true});
         var rawData = await this.findData();
         var groupedData = this.groupData(rawData);
         var labels = this.getLabels(groupedData);
@@ -141,7 +144,7 @@ class BarsChartBase extends Component {
         var barData = buildBarData(labels,averages, backgroundColors, hoverBGColors);
         var dougData = buildDougData(labels, dataQuantity, backgroundColors, hoverBGColors);
         
-        this.setState({barData: barData, dougData: dougData});
+        this.setState({barData: barData, dougData: dougData, loading: false});
     }
 
     getLabels(groupedData){
@@ -249,23 +252,25 @@ class BarsChartBase extends Component {
 
     render() {
         const { classes } = this.props;
+        const { loading } = this.state;
 
         return (
             <div>
                 <div className={classes.container}>
                     <Grid justify="space-between" container>
                         <Grid item>
-                            <Button variant="contained" startIcon={<FindReplaceIcon />} size="small" color="primary" onClick={this.calculateData}>Calculate</Button>
+                            <Button disabled={this.state.loading} variant="contained" startIcon={<FindReplaceIcon />} size="small" color="primary" onClick={this.calculateData}>Calculate</Button>
                         </Grid>
                         <Grid item>
                             <Button variant="contained" startIcon={<PictureAsPdfIcon />} size="small" color="primary" onClick={this.handleDownload}>Download</Button>
                         </Grid>
                     </Grid>
                 </div>
-                <div>
+                {loading && <LinearProgress color="secondary" />}
+                <div className={classes.container}>
                     <Bar id="barChart" ref="barChart" data={this.state.barData} options={optionsBar}/>
                 </div>
-                <div>
+                <div className={classes.container}> 
                     <Doughnut id="dougChart" ref="dougChart" data={this.state.dougData} options={optionsDoug}/>
                 </div>
             </div>

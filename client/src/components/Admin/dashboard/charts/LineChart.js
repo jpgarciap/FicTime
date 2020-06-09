@@ -10,7 +10,9 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 import Button from '@material-ui/core/Button';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import Grid from '@material-ui/core/Grid';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import jsPDF from 'jspdf';
+
 
 
 function processAverage(startAverage, endAverage){
@@ -125,7 +127,8 @@ class LineChartBase extends Component {
 
   constructor (props) {
     super(props);
-    this.state = { 
+    this.state = {
+      loading : false,
       workShifts: [],
       charData: buildCharData([],[],[])
     };
@@ -174,6 +177,7 @@ class LineChartBase extends Component {
 
   handleChange = async(event) => {
     if (event.target.value !== "NONE") {
+      this.setState({loading: true})
       try {
         var startAccumulateData = [];
         var endAccumulateData = [];
@@ -182,7 +186,7 @@ class LineChartBase extends Component {
         this.accumulateData(historicals, workShiftHourData, startAccumulateData, endAccumulateData);
         var startAverage = this.calculateAverage(startAccumulateData);
         var endAverage = this.calculateAverage(endAccumulateData);
-        this.setState({charData: processAverage(startAverage, endAverage)});
+        this.setState({charData: processAverage(startAverage, endAverage), loading: false});
 
       } catch(err){
         console.log('ERROR')
@@ -276,6 +280,7 @@ class LineChartBase extends Component {
 
   render() {
     const { classes } = this.props;
+    const { loading } = this.state;
     return (
       <div className={classes.container}>
           <div>
@@ -284,6 +289,7 @@ class LineChartBase extends Component {
                 <FormControl className={classes.formControl}>
                 <InputLabel> Work Shift</InputLabel>
                   <NativeSelect
+                    disabled={this.state.loading}
                     onChange={this.handleChange}
                     >
                     <option value={"NONE"}></option>
@@ -298,7 +304,8 @@ class LineChartBase extends Component {
               </Grid>
             </Grid>
           </div>
-          <div>
+          {loading && <LinearProgress color="secondary" />}
+          <div className={classes.container}>
             <Line id="chart" ref="chart" data={this.state.charData} options={optionsGraphic}/>
           </div>
       </div>
