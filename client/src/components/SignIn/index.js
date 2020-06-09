@@ -16,14 +16,21 @@ import PropTypes from 'prop-types';
 import { compose } from 'recompose';
 import { withRouter } from 'react-router';
 import { app } from '../Firebase/firebase';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
 
 const styles = Utils.formStyles;
 
 const INITIAL_STATE = {
   email: '',
   password: '',
-  error: null
+  openAlert: false
 };
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class SignInFormBase extends React.Component {
   constructor(props) {
@@ -46,9 +53,13 @@ class SignInFormBase extends React.Component {
     })
     .catch(error => {
       console.log(error);
-      this.setState({ error });
+      this.setState({ openAlert: true });
     })
   };
+
+  handleClose = () => {
+    this.setState( {openAlert: false});
+  }
 
   render() {
     const { email, password } = this.state;
@@ -113,6 +124,11 @@ class SignInFormBase extends React.Component {
               </Grid>
             </Grid>
           </form>
+          <Snackbar className={classes.alert} open={this.state.openAlert} autoHideDuration={6000} onClose={this.handleClose}>
+            <Alert onClose={this.handleClose} severity="error">
+              Authentication error
+            </Alert>
+          </Snackbar>            
         </div>
       </Container>      
     )

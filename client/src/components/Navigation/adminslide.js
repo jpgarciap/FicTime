@@ -20,12 +20,18 @@ class AdminSlideBase extends React.Component {
         this.state = { 
           checked: false
         };
+        this._isMounted = false;
     }
 
     componentDidMount(){
+        this._isMounted = true;
         this.setState({
             checked : this.props.location.pathname.includes('admin')
         });
+    }
+
+    componentWillUnmount(){
+        this._isMounted = false;
     }
 
     handleChange = (event) => {

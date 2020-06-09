@@ -19,6 +19,9 @@ export const formStyles = theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  alert: {
+    marginBottom: theme.spacing(10),
+  }
 });
 
 export const chartsStyles = theme => ({

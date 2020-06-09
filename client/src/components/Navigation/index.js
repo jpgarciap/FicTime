@@ -48,6 +48,7 @@ export default function Navigation() {
   
   function logout() {
     app.auth().signOut();
+    setIsAdmin(false);
   }
 
 

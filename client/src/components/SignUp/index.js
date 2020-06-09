@@ -7,17 +7,24 @@ import Container from '@material-ui/core/Container';
 import * as Utils from '../../constants/utils';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import MuiAlert from '@material-ui/lab/Alert';
 import { compose } from 'recompose';
 import { app } from '../Firebase/firebase'
+import Snackbar from '@material-ui/core/Snackbar';
 
 
 const INITIAL_STATE = {
   email: '',
   description: '',
-  date: new Date()
+  date: new Date(),
+  openAlert: false
 };
 
 const styles = Utils.formStyles;
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class SignUpForm extends React.Component {
   constructor(props) {
@@ -34,9 +41,12 @@ class SignUpForm extends React.Component {
   onSubmit = event => {
     event.preventDefault();
     app.firestore().collection('accounts').add(this.state);  
-    console.log('OK')
+    this.setState({ openAlert: true, email: '', description: ''});
   };
 
+  handleClose = () => {
+    this.setState( {openAlert: false});
+  }
 
   render() {
     const { classes } = this.props;
@@ -52,6 +62,7 @@ class SignUpForm extends React.Component {
                   variant="outlined"
                   margin="normal"
                   required
+                  value={this.state.email}
                   fullWidth
                   id="email"
                   label="Your Email Address"
@@ -64,6 +75,7 @@ class SignUpForm extends React.Component {
                   id="description"
                   label="Description"
                   name="description"
+                  value={this.state.description}
                   fullWidth
                   multiline
                   rows="4"
@@ -79,6 +91,11 @@ class SignUpForm extends React.Component {
                 >
                   Send Email
                 </Button>
+                <Snackbar className={classes.alert} open={this.state.openAlert} autoHideDuration={6000} onClose={this.handleClose}>
+                  <Alert onClose={this.handleClose} severity="success">
+                    Success! Your request was sent
+                  </Alert>
+                </Snackbar>  
               </form>
             </div>
           </Container>
