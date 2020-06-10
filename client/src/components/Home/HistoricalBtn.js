@@ -12,7 +12,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { app } from '../Firebase/firebase'
 import jsPDF from 'jspdf'
 import * as COLORS from '../../constants/colors';
+import { GreyButton } from '../../constants/buttons';
 import 'jspdf-autotable';
+
 const styles = Utils.registIncidence;
 
 function convertDate(date) {
@@ -109,9 +111,9 @@ class HistoricalBtnBase extends React.Component {
 
         return(
             <div>
-                <Button variant="contained" startIcon={<ImportExportIcon />} size="large" color="primary" onClick={this.handleClickOpen} className={classes.margin}>
+                <GreyButton variant="contained" startIcon={<ImportExportIcon />} size="large" color="primary" onClick={this.handleClickOpen} className={classes.margin}>
                     Export Historical
-                </Button>
+                </GreyButton>
                 <Dialog open={open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Export Historical</DialogTitle>
                     <DialogContent>

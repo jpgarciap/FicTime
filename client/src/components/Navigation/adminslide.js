@@ -51,7 +51,7 @@ class AdminSlideBase extends React.Component {
         const checked = location.pathname.includes('admin') && this.state.checked;
         return (
             <FormControlLabel
-            control={<Switch checked={checked} onChange={this.handleChange} name="checked"/>}
+            control={<Switch checked={checked} color="primary" onChange={this.handleChange} name="checked"/>}
             label={<Typography variant="h6" style={{color: COLORS.WATERMELON}}>Admin</Typography>}          />
         );
     }

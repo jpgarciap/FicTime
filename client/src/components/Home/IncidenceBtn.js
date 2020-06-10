@@ -13,6 +13,9 @@ import FormControl from '@material-ui/core/FormControl';
 import { app } from '../Firebase/firebase'
 import NativeSelect from '@material-ui/core/NativeSelect';
 import InputLabel from '@material-ui/core/InputLabel';
+import { YellowButton } from '../../constants/buttons';
+import { Alert, AlertTitle } from '@material-ui/lab';
+
 
 const styles = Utils.registIncidence;
 
@@ -24,7 +27,8 @@ class IncidenceBtnBase extends React.Component {
             open: false,
             date: this.getTodayDateformat(),
             type: "Start",
-            hour: "07:30"
+            hour: "07:30",
+            showAlert: false
         };
     }
 
@@ -71,7 +75,7 @@ class IncidenceBtnBase extends React.Component {
         } else if (canRegistEnd){
             this.updateEntry(historical.id, {end: this.state.hour })
         } else {
-            alert("Ya tiene un registro para este dia")
+            this.setState({showAlert: true});
         }
     }
 
@@ -115,16 +119,26 @@ class IncidenceBtnBase extends React.Component {
         });
     };
 
+    closeAlert = () => {
+        this.setState({ showAlert: false})
+    }
+
     render() {
         const { classes } = this.props;
         const { open } = this.state;
         const today = new Date();
         return(
             <div>
-                <Button variant="contained" startIcon={<NotificationImportantRoundedIcon />} size="large" color="primary" onClick={this.handleClickOpen} className={classes.margin}>
+                <YellowButton variant="contained" startIcon={<NotificationImportantRoundedIcon />} size="large" color="primary" onClick={this.handleClickOpen} className={classes.margin}>
                     Incidence
-                </Button>
+                </YellowButton>
                 <Dialog open={open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
+                    {this.state.showAlert && 
+                        <Alert severity="warning" onClose={this.closeAlert}>
+                            <AlertTitle>Warning</AlertTitle>
+                            you have already registered this day
+                        </Alert>
+                    }
                     <DialogTitle id="form-dialog-title">Regist Incidence</DialogTitle>
                     <DialogContent>
                         <form className={classes.container}>
@@ -179,7 +193,7 @@ class IncidenceBtnBase extends React.Component {
                             Regist
                         </Button>
                     </DialogActions>
-                </Dialog>    
+                </Dialog>
             </div>
         )
     }

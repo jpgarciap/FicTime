@@ -4,11 +4,26 @@ import { FirebaseDataProvider } from 'react-admin-firebase';
 import accounts from './accounts';
 import offices from './offices';
 import workShifts from './workShifts';
+import * as COLORS from '../../constants/colors'
 import users from './users';
+import { createMuiTheme } from '@material-ui/core/styles';
 import historicals from './historicals';
 import Dashboard from './dashboard';
+import MyLayout from './menu/layout';
 
 var createHistory = require("history").createBrowserHistory;
+
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: COLORS.WATERMELON,
+    },
+    secondary: {
+      main: COLORS.SKY,
+    },
+  },
+});
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -30,7 +45,8 @@ class AdminDashboard extends React.Component {
 
   render() {
     return (
-    <Admin dashboard={Dashboard} dataProvider={dataProvider} history={history}>
+      
+    <Admin theme={theme} layout={MyLayout} dashboard={Dashboard} dataProvider={dataProvider} history={history}>
         <Resource name="accounts" {...accounts}/>
         <Resource name="offices" {...offices}/>
         <Resource name="workShifts" {...workShifts}/>

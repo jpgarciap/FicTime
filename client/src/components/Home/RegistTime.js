@@ -13,13 +13,16 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import * as Utils from '../../constants/utils';
+import * as COLORS from '../../constants/colors';
 import { compose } from 'recompose';
 import IncidenceBtn from './IncidenceBtn';
 import HistoricalBtn from './HistoricalBtn';
+import { GreenButton } from '../../constants/buttons';
+import Clock from 'react-live-clock';
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
-      backgroundColor: theme.palette.common.black,
+      backgroundColor: COLORS.WATERMELON,
       color: theme.palette.common.white,
     },
     body: {
@@ -36,7 +39,6 @@ const StyledTableCell = withStyles((theme) => ({
   }))(TableRow);
   
 const tableStyles = Utils.tableStyles;
-
 
 function createData(dateWithoutFormat, start, end) {
   var date = convertDate(dateWithoutFormat);
@@ -83,6 +85,10 @@ class RegistTimeBase extends React.Component {
   }
 
   componentDidMount() {
+    this.loadData();
+  }
+
+  loadData(){
     var email = this.props.email;    
     var historicals = app.firestore().collection('historicals');
 
@@ -135,6 +141,8 @@ class RegistTimeBase extends React.Component {
       }
       this.updateHistorical(historicalTodayDocId, updateData);
     }
+    this.loadData();
+    this.forceUpdate();
   };
 
   onEnd = event => {
@@ -154,13 +162,14 @@ class RegistTimeBase extends React.Component {
       }
       this.updateHistorical(historicalTodayDocId, updateData);
     }
+    this.loadData();
+    this.forceUpdate();
   }
 
   addHistorical (data) {
     app.firestore().collection('historicals').add(data)
       .then(function(docRef) {
         console.log("Document written with ID: ", docRef.id);
-        window.location.reload();
       })
       .catch(function(error) {
         console.error("Error adding document: ", error);
@@ -173,7 +182,6 @@ class RegistTimeBase extends React.Component {
     historicalDoc.update(data)
     .then(function() {
       console.log("Document successfully updated!");
-      window.location.reload();
     })
     .catch(function(error) {
       console.error("Error updating document: ", error);
@@ -183,39 +191,46 @@ class RegistTimeBase extends React.Component {
   render() {
 
     const { classes } = this.props;
-    const { rows, actionBtns } = this.state;
+    const { actionBtns } = this.state;
     return(
       <div className={classes.container}>
           <div>
-              <Button variant="contained" startIcon={<InputIcon />} size="large" color="primary" onClick={this.onStart} className={classes.margin} disabled={actionBtns.disableStart} >Start</Button>
+              <h1>
+               <Clock format="HH:mm:ss" interval={1000} ticking={true} />
+              </h1>
+          </div>
+          <div>
+              <GreenButton variant="contained" startIcon={<InputIcon />} size="large" onClick={this.onStart} className={classes.margin} disabled={actionBtns.disableStart} >Start</GreenButton>
               <Button variant="contained" startIcon={<ExitToAppIcon />} size="large" color="primary" onClick={this.onEnd} className={classes.margin} disabled={actionBtns.disableEnd}>End</Button>
           </div>
           <div>
               <IncidenceBtn userDocId={this.state.userDocId}/>
           </div>
           <div>
-              <TableContainer component={Paper} className={classes.tableContainer}>
-                  <Table aria-label="customized table">
-                      <TableHead>
-                      <TableRow>
-                          <StyledTableCell>Date</StyledTableCell>
-                          <StyledTableCell align="right">Start</StyledTableCell>
-                          <StyledTableCell align="right">End</StyledTableCell>
-                      </TableRow>
-                      </TableHead>
-                      <TableBody>
-                      {rows.map((row) => (
-                          <StyledTableRow key={row.date}>
-                          <StyledTableCell component="th" scope="row">
-                              {row.date}
-                          </StyledTableCell>
-                          <StyledTableCell align="right">{row.start}</StyledTableCell>
-                          <StyledTableCell align="right">{row.end}</StyledTableCell>
-                          </StyledTableRow>
-                      ))}
-                      </TableBody>
-                  </Table>
-              </TableContainer>
+              { this.state.rows.length > 0 &&
+                <TableContainer component={Paper} className={classes.tableContainer}>
+                    <Table aria-label="customized table">
+                        <TableHead>
+                        <TableRow>
+                            <StyledTableCell>Date</StyledTableCell>
+                            <StyledTableCell align="right">Start</StyledTableCell>
+                            <StyledTableCell align="right">End</StyledTableCell>
+                        </TableRow>
+                        </TableHead>
+                        <TableBody>
+                        {this.state.rows.map((row) => (
+                            <StyledTableRow key={row.date}>
+                            <StyledTableCell component="th" scope="row">
+                                {row.date}
+                            </StyledTableCell>
+                            <StyledTableCell align="right">{row.start}</StyledTableCell>
+                            <StyledTableCell align="right">{row.end}</StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+              }
           </div>
           <div>
               <HistoricalBtn userDocId={this.state.userDocId}/>
