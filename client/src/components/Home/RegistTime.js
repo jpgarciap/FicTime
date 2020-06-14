@@ -18,7 +18,9 @@ import { compose } from 'recompose';
 import IncidenceBtn from './IncidenceBtn';
 import HistoricalBtn from './HistoricalBtn';
 import { GreenButton } from '../../constants/buttons';
-import Clock from 'react-live-clock';
+import MyClock from './Clock/clock';
+import Grid from '@material-ui/core/Grid';
+
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
@@ -38,7 +40,7 @@ const StyledTableCell = withStyles((theme) => ({
     },
   }))(TableRow);
   
-const tableStyles = Utils.tableStyles;
+const styles = Utils.registTime;
 
 function createData(dateWithoutFormat, start, end) {
   var date = convertDate(dateWithoutFormat);
@@ -125,7 +127,7 @@ class RegistTimeBase extends React.Component {
   }
 
 
-  onStart = event => {
+  onStart = () => {
     const { userDocId, historicalTodayDocId } = this.state;
     var time = getTime();
     if (historicalTodayDocId == null){
@@ -145,7 +147,7 @@ class RegistTimeBase extends React.Component {
     this.forceUpdate();
   };
 
-  onEnd = event => {
+  onEnd = () => {
     const { userDocId, historicalTodayDocId } = this.state;
     var time = getTime();
 
@@ -194,11 +196,11 @@ class RegistTimeBase extends React.Component {
     const { actionBtns } = this.state;
     return(
       <div className={classes.container}>
-          <div>
-              <h1>
-               <Clock format="HH:mm:ss" interval={1000} ticking={true} />
-              </h1>
-          </div>
+          <Grid container justify="center" alignItems="center">
+            <Grid item xs={5}>
+              <MyClock/>
+            </Grid>
+          </Grid>
           <div>
               <GreenButton variant="contained" startIcon={<InputIcon />} size="large" onClick={this.onStart} className={classes.margin} disabled={actionBtns.disableStart} >Start</GreenButton>
               <Button variant="contained" startIcon={<ExitToAppIcon />} size="large" color="primary" onClick={this.onEnd} className={classes.margin} disabled={actionBtns.disableEnd}>End</Button>
@@ -248,6 +250,6 @@ RegistTimeBase.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-const RegistTime = compose(withStyles(tableStyles)) (RegistTimeBase);
+const RegistTime = compose(withStyles(styles)) (RegistTimeBase);
 
 export default RegistTime;

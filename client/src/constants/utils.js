@@ -36,7 +36,7 @@ export const chartsStyles = theme => ({
 });
 
 
-export const tableStyles = theme => ({
+export const registTime = theme => ({
   tableContainer: {
       marginTop: theme.spacing(5),
       width: "%",
@@ -54,7 +54,7 @@ export const tableStyles = theme => ({
   },
   container: {
     textAlign: "center",
-  },  
+  }
 });
 
 export const registIncidence = theme => ({
