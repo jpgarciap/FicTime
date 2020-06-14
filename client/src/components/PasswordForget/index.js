@@ -9,12 +9,19 @@ import { withRouter} from 'react-router';
 import { app } from '../Firebase/firebase';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import { compose } from 'recompose';
 
 const styles = Utils.formStyles;
 const INITIAL_STATE = {
-  email: ''
+  email: '',
+  showAlert: false
 };
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class PasswordForgetForm extends React.Component {
   constructor(props) {
@@ -33,12 +40,16 @@ class PasswordForgetForm extends React.Component {
     event.preventDefault();
     app.auth().sendPasswordResetEmail(email.trim())
     .then(() => {
-      alert('OK');
+      this.setState( {showAlert: true});
     })
     .catch(error => {
-      alert(error);
+      console.log(error);
     })
- };
+  };
+
+  handleClose = () => {
+    this.setState( {showAlert: false});
+  }
 
  render(){
   const { classes } = this.props;
@@ -71,6 +82,11 @@ class PasswordForgetForm extends React.Component {
               >
                 Send Email
               </Button>
+              <Snackbar className={classes.alert} open={this.state.showAlert} autoHideDuration={6000} onClose={this.handleClose}>
+                  <Alert onClose={this.handleClose} severity="success">
+                    Success! Check your email
+                  </Alert>
+              </Snackbar>                
             </form>
           </div>
         </Container>

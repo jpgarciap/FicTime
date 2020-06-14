@@ -107,3 +107,14 @@ export const navigation = theme => ({
       flexGrow: 1,
     },
 });
+
+export const welcome = theme => ({
+  container: {
+    margin: theme.spacing(10),
+    textAlign: "center",
+  },
+  title: {
+    width: '100%',
+    marginTop: theme.spacing(3)
+  }
+})

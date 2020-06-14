@@ -1,31 +1,39 @@
 import React from 'react';
-import { List, Datagrid, TextField, ReferenceField, Filter, ReferenceInput, AutocompleteInput, DateField } from 'react-admin';
+import { List, downloadCSV, Datagrid, TextField, ReferenceField, Filter, ReferenceInput, AutocompleteInput, DateField } from 'react-admin';
+import jsonExport from 'jsonexport/dist';
+
+const exporter = (records, fetchRelatedRecords) => {
+
+    fetchRelatedRecords(records, "user", "users").then(historicals => {
+        const data = records.map(record => ({date: record.date, start: record.start, end: record.end,
+            name: historicals[record.user].name,
+            dni: historicals[record.user].dni
+        }));
+        jsonExport(data, {
+            headers: ['name', 'dni', 'date', 'start', 'end']
+        }, (err, csv) => {
+            downloadCSV(csv, 'historicals');
+        });
+    })
+
+};
 
 const HistoricalFilters = props => (
     <Filter {...props}>
         <ReferenceInput
-                label="email"
-                source="user"
-                reference="users"
-                filterToQuery={searchText => ({ email: searchText })}>
-            <AutocompleteInput optionText="email" />
-        </ReferenceInput>
-
-        <ReferenceInput
-                label="DNI"
+                label="dni"
                 source="user"
                 reference="users"
                 filterToQuery={searchText => ({ dni: searchText })}>
-            <AutocompleteInput optionText="dni" />
+                <AutocompleteInput optionText="dni" />
         </ReferenceInput>
-
     </Filter>
 );
 
 
 
 const HistoricalList = props => (
-    <List {...props} filters={<HistoricalFilters />} title="Historicals" bulkActionButtons={false}>
+    <List {...props} exporter={exporter} filters={<HistoricalFilters />} title="Historicals" bulkActionButtons={false}>
         <Datagrid>
             <ReferenceField label="Email" source="user" reference="users">
                 <TextField source="email" />
