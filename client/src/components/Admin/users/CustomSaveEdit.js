@@ -14,11 +14,11 @@ const CustomSaveEdit = ({ handleSubmitWithRedirect, ...props }) => {
             admin : isAdmin
         };  
 
-        axios.put(`http://localhost:9000/users/updateAdm/${email}`, userObject)
+        axios.put(`/users/updateAdm/${email}`, userObject)
             .then((res) => {
                 handleSubmitWithRedirect('list');
             }).catch((error) => {
-                alert(error);
+                console.log(error);
             });
     }, [form, handleSubmitWithRedirect ]);
 

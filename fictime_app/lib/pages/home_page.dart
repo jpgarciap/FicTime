@@ -1,0 +1,209 @@
+import 'package:flutter/material.dart';
+import 'package:fictime/services/authentication.dart';
+import 'package:fictime/utils/colors.dart';
+import 'package:fictime/services/firestoreService.dart';
+import 'package:fictime/model/historicalEntry.dart';
+import 'package:fictime/utils/historicaUtils.dart';
+import 'dart:async';
+
+class HomePage extends StatefulWidget {
+  HomePage({Key key, this.auth, this.userId, this.logoutCallback});
+
+  final BaseAuth auth;
+  final VoidCallback logoutCallback;
+  final String userId;
+
+  @override
+  State<StatefulWidget> createState() => new _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FirestoreService firestoreService = new FirestoreServiceImpl();
+  List<HistoricalEntry> registers = new List<HistoricalEntry>();
+  bool _isLoading;
+  bool _hasStartToday;
+  bool _hasEndToday;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLoading = false;
+    findHistoricals();
+  }
+
+  Future<List<HistoricalEntry>> findHistoricals() async {
+    String email = await widget.auth.getEmail();
+    String userDocId = await firestoreService.getUserDocId(email);
+    return await firestoreService.getHistoricals(userDocId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<HistoricalEntry>>(
+      future: findHistoricals(),
+      builder: (BuildContext context, AsyncSnapshot<List<HistoricalEntry>> snapshot) =>
+               new Scaffold(
+                  appBar: new AppBar(
+                    title: new Text("FicTime"),
+                    actions: <Widget>[
+                      IconButton(
+                          icon: Icon(Icons.exit_to_app),
+                          tooltip: 'Exit',
+                          onPressed: signOut),
+                    ],
+                  ),
+                  body: Stack(
+                    children: <Widget>[
+                      snapshot.hasData ?
+                      _showForm(snapshot.data)
+                      :
+                      Text(
+                        'Hello, itemNo: ${snapshot.data}',
+                      )
+                    ],
+                  ))
+
+    );
+  }
+
+  Widget _showForm(List<HistoricalEntry> historicals) {
+    registers = historicals;
+    _hasStartToday = HistoricalUtils.hasStartToday(historicals);
+    _hasEndToday = HistoricalUtils.hasEndToday(historicals);
+
+    return new Container(
+        padding: EdgeInsets.all(16.0),
+        child: new Form(
+          key: _formKey,
+          child: new ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              _registerButtons(),
+              _table(),
+              _incidenceButton()
+            ],
+          ),
+        ));
+  }
+
+  Widget _registerButtons(){
+    return new Padding(
+        padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
+        child: SizedBox(
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                startButton(),
+                endButton()
+              ]
+          )
+        )
+    );
+  }
+
+  Widget startButton(){
+    return ButtonTheme(
+        minWidth: 160.0,
+        height: 50.0,
+      child: RaisedButton(
+          elevation: 5.0,
+          shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(10.0)),
+          color: Colors.green,
+          child:
+            Text(' Start', style: new TextStyle(fontSize: 25.0, color: Colors.black)),
+          onPressed: null
+      )
+    );
+  }
+
+  Widget endButton(){
+    return ButtonTheme(
+        minWidth: 160.0,
+        height: 50.0,
+        child: RaisedButton(
+            elevation: 5.0,
+            shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(10.0)),
+            color: WatermelonColor.getColor(),
+            child: new Text('End',
+                style: new TextStyle(fontSize: 25.0, color: Colors.white)),
+            onPressed: ()=>{}
+        )
+    );
+  }
+
+  Widget _table() {
+    return new Padding(
+      padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
+      child: DataTable(columns: const <DataColumn>[
+        DataColumn(
+          label: Text(
+            'Date',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        DataColumn(
+          label: Text(
+            'Start',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        DataColumn(
+          label: Text(
+            'End',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+      ], rows: getRows()
+      )
+    );
+  }
+
+  List<DataRow> getRows(){
+    List<DataRow> rows = new List<DataRow>();
+    for (HistoricalEntry entry in registers){
+      DataRow row = DataRow(cells: [
+        DataCell(Text(entry.getDateFormat())),
+        DataCell(Text(entry.getStart())),
+        DataCell(Text(entry.getEnd())),
+      ]);
+      rows.add(row);
+    }
+    return rows;
+  }
+
+  Widget _incidenceButton(){
+    return new Padding(
+        padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
+        child: SizedBox(
+          height: 50.0,
+          child: new RaisedButton(
+            elevation: 5.0,
+            shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(10.0)),
+            color: Colors.yellow,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.notifications, color: Colors.black, size: 36.0),
+                  Text(' Incidence', style: new TextStyle(fontSize: 25.0, color: Colors.black))
+                ]
+            ),
+            onPressed: () => {},
+          ),
+        )
+    );
+  }
+
+  signOut() async {
+    try {
+      await widget.auth.signOut();
+      widget.logoutCallback();
+    } catch (e) {
+      print(e);
+    }
+  }
+}

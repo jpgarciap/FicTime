@@ -9,7 +9,7 @@ const CustomUserDelete = ({ ...props }) => {
     const handleClick = useCallback(() => {
         const email = form.getFieldState('email').value;
         const id = props.id;
-        axios.delete(`http://localhost:9000/users/delete/${email}/${id}`, {})
+        axios.delete(`/users/delete/${email}/${id}`, {})
 
     }, [form, props.id]);
 

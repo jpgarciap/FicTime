@@ -20,14 +20,13 @@ const CustomSave = ({ handleSubmitWithRedirect, ...props }) => {
             },
             admin : isAdmin
         };  
-        axios.post('http://localhost:9000/users/create', userObject)
+        axios.post('/users/create', userObject)
             .then((res) => {
                 form.change('password', ' ');
                 handleSubmitWithRedirect('list');
             }).catch((error) => {
                 var errorMessage = error.response.data.error;
-                alert(errorMessage);
-                
+                console.log(errorMessage);  
             });
     }, [form, handleSubmitWithRedirect ]);
 
