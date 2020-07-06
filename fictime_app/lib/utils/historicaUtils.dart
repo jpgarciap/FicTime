@@ -20,4 +20,14 @@ class HistoricalUtils {
     }
     return false;
   }
+
+  static HistoricalEntry todayEntry(List<HistoricalEntry> historicals){
+    for (HistoricalEntry entry in historicals){
+      if (entry.isToday()) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
 }

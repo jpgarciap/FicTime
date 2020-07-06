@@ -34,4 +34,8 @@ class HistoricalEntry {
   String getEnd(){
     return this.end == null ? "" : this.end;
   }
+
+  String getDocId(){
+    return this.docId;
+  }
 }

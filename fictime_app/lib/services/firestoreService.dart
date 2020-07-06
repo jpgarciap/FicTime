@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fictime/model/historicalEntry.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 abstract class FirestoreService {
   Future<List<HistoricalEntry>> getHistoricals(String userDocId);
   Future<String> getUserDocId(String email);
-  Future<void> addNewStart();
-  Future<void> addNewEnd();
+  Future<void> addNewStart(String userDocId);
+  Future<void> addNewEnd(String userDocId);
   Future<void> updateTodayStart(String historicalDocId);
   Future<void> updateTodayEnd(String historicalDocId);
 }
@@ -40,26 +42,26 @@ class FirestoreServiceImpl implements FirestoreService {
   }
 
   @override
-  Future<void> addNewEnd() {
-    // TODO: implement addNewEnd
-    throw UnimplementedError();
+  Future<void> addNewEnd(String userDocId) async {
+    return historicalRef.document().setData({"date": DateTime.now(), "user": userDocId, "end": getHour()});
+  }
+
+  String getHour(){
+    return DateFormat('HH:mm').format(DateTime.now());
   }
 
   @override
-  Future<void> addNewStart() {
-    // TODO: implement addNewStart
-    throw UnimplementedError();
+  Future<void> addNewStart(String userDocId) {
+    return historicalRef.document().setData({"date": DateTime.now(), "user": userDocId, "start": getHour()});
   }
 
   @override
   Future<void> updateTodayEnd(String historicalDocId) {
-    // TODO: implement updateTodayEnd
-    throw UnimplementedError();
+    return historicalRef.document(historicalDocId).updateData({"end": getHour()});
   }
 
   @override
   Future<void> updateTodayStart(String historicalDocId) {
-    // TODO: implement updateTodayStart
-    throw UnimplementedError();
+    return historicalRef.document(historicalDocId).updateData({"start": getHour()});
   }
 }

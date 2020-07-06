@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FirestoreService firestoreService = new FirestoreServiceImpl();
   List<HistoricalEntry> registers = new List<HistoricalEntry>();
+  String _userDocId;
   bool _isLoading;
   bool _hasStartToday;
   bool _hasEndToday;
@@ -35,43 +36,40 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<HistoricalEntry>> findHistoricals() async {
     String email = await widget.auth.getEmail();
-    String userDocId = await firestoreService.getUserDocId(email);
-    return await firestoreService.getHistoricals(userDocId);
+    _userDocId = await firestoreService.getUserDocId(email);
+    return await firestoreService.getHistoricals(_userDocId);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<HistoricalEntry>>(
-      future: findHistoricals(),
-      builder: (BuildContext context, AsyncSnapshot<List<HistoricalEntry>> snapshot) =>
-               new Scaffold(
-                  appBar: new AppBar(
-                    title: new Text("FicTime"),
-                    actions: <Widget>[
-                      IconButton(
-                          icon: Icon(Icons.exit_to_app),
-                          tooltip: 'Exit',
-                          onPressed: signOut),
-                    ],
-                  ),
-                  body: Stack(
-                    children: <Widget>[
-                      snapshot.hasData ?
-                      _showForm(snapshot.data)
-                      :
-                      Text(
-                        'Hello, itemNo: ${snapshot.data}',
-                      )
-                    ],
-                  ))
-
-    );
+        future: findHistoricals(),
+        builder: (BuildContext context,
+                AsyncSnapshot<List<HistoricalEntry>> snapshot) =>
+            new Scaffold(
+                appBar: new AppBar(
+                  title: new Text("FicTime"),
+                  actions: <Widget>[
+                    IconButton(
+                        icon: Icon(Icons.exit_to_app),
+                        tooltip: 'Exit',
+                        onPressed: signOut),
+                  ],
+                ),
+                body: Stack(
+                  children: <Widget>[
+                    snapshot.hasData
+                        ? _showForm(snapshot.data)
+                        : _showCircularProgress(true)
+                  ],
+                )));
   }
 
   Widget _showForm(List<HistoricalEntry> historicals) {
     registers = historicals;
     _hasStartToday = HistoricalUtils.hasStartToday(historicals);
     _hasEndToday = HistoricalUtils.hasEndToday(historicals);
+    _showCircularProgress(false);
 
     return new Container(
         padding: EdgeInsets.all(16.0),
@@ -81,6 +79,7 @@ class _HomePageState extends State<HomePage> {
             shrinkWrap: true,
             children: <Widget>[
               _registerButtons(),
+              _showCircularProgress(false),
               _table(),
               _incidenceButton()
             ],
@@ -114,9 +113,39 @@ class _HomePageState extends State<HomePage> {
           color: Colors.green,
           child:
             Text(' Start', style: new TextStyle(fontSize: 25.0, color: Colors.black)),
-          onPressed: null
+          onPressed: !_hasStartToday && !_hasEndToday ? registStart : null
       )
     );
+  }
+
+  void registStart() async{
+   HistoricalEntry todayEntry = HistoricalUtils.todayEntry(registers);
+   setState(() {
+     _isLoading = true;
+   });
+   if (todayEntry == null) {
+     await firestoreService.addNewStart(_userDocId);
+   } else{
+     await firestoreService.updateTodayStart(todayEntry.getDocId());
+   }
+   setState(() {
+     _isLoading = false;
+   });
+  }
+
+  void registEnd() async{
+    HistoricalEntry todayEntry = HistoricalUtils.todayEntry(registers);
+    setState(() {
+      _isLoading = true;
+    });
+    if (todayEntry == null) {
+      await firestoreService.addNewEnd(_userDocId);
+    } else{
+      await firestoreService.updateTodayEnd(todayEntry.getDocId());
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Widget endButton(){
@@ -130,7 +159,7 @@ class _HomePageState extends State<HomePage> {
             color: WatermelonColor.getColor(),
             child: new Text('End',
                 style: new TextStyle(fontSize: 25.0, color: Colors.white)),
-            onPressed: ()=>{}
+            onPressed: !_hasEndToday ? registEnd : null
         )
     );
   }
@@ -205,5 +234,15 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Widget _showCircularProgress(bool force) {
+    if (_isLoading || force) {
+      return Center(child: CircularProgressIndicator());
+    }
+    return Container(
+      height: 0.0,
+      width: 0.0,
+    );
   }
 }
