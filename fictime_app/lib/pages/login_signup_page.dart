@@ -68,11 +68,6 @@ class _LoginSignupPageState extends State<LoginSignupPage>{
     super.initState();
   }
 
-  void resetForm() {
-    _formKey.currentState.reset();
-    _errorMessage = "";
-  }
-
   void pushRequestAccount() {
     Navigator.push(
       context,
@@ -215,14 +210,14 @@ class _LoginSignupPageState extends State<LoginSignupPage>{
   Widget requestAccountButton() {
     return new FlatButton(
         child: new Text( 'Request  an account',
-            style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.w300)),
+            style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.w300)),
         onPressed: pushRequestAccount);
   }
 
   Widget forgetPasswordButton() {
     return new FlatButton(
         child: new Text( 'Forget Password',
-            style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.w300)),
+            style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.w300)),
         onPressed: pushForgetPassword);
   }
 

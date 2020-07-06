@@ -9,8 +9,13 @@ abstract class FirestoreService {
   Future<String> getUserDocId(String email);
   Future<void> addNewStart(String userDocId);
   Future<void> addNewEnd(String userDocId);
+  Future<void> addNewStartWithDate(String userDocId, DateTime dateTime);
+  Future<void> addNewEndWithDate(String userDocId,  DateTime dateTime);
   Future<void> updateTodayStart(String historicalDocId);
   Future<void> updateTodayEnd(String historicalDocId);
+  Future<void> updateRegistWithEnd(String historicalDocId, String hour);
+  Future<void> updateRegistWithStart(String historicalDocId, String hour);
+  Future<HistoricalEntry> getRegistByDate(String userDocId, DateTime date);
 }
 
 class FirestoreServiceImpl implements FirestoreService {
@@ -43,16 +48,33 @@ class FirestoreServiceImpl implements FirestoreService {
 
   @override
   Future<void> addNewEnd(String userDocId) async {
-    return historicalRef.document().setData({"date": DateTime.now(), "user": userDocId, "end": getHour()});
+    return historicalRef.document().setData({"date": getDate(), "user": userDocId, "end": getHour()});
+  }
+
+  @override
+  Future<void> addNewEndWithDate(String userDocId, DateTime date) async {
+    DateTime dateToAdd = DateTime(date.year, date.month, date.day);
+    return historicalRef.document().setData({"date": dateToAdd, "user": userDocId, "end": getHour()});
   }
 
   String getHour(){
     return DateFormat('HH:mm').format(DateTime.now());
   }
 
+  DateTime getDate(){
+    DateTime now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
   @override
-  Future<void> addNewStart(String userDocId) {
-    return historicalRef.document().setData({"date": DateTime.now(), "user": userDocId, "start": getHour()});
+  Future<void> addNewStart(String userDocId) async{
+    return historicalRef.document().setData({"date": getDate(), "user": userDocId, "start": getHour()});
+  }
+
+  @override
+  Future<void> addNewStartWithDate(String userDocId,  DateTime date) async{
+    DateTime dateToAdd = DateTime(date.year, date.month, date.day);
+    return historicalRef.document().setData({"date": dateToAdd, "user": userDocId, "start": getHour()});
   }
 
   @override
@@ -64,4 +86,32 @@ class FirestoreServiceImpl implements FirestoreService {
   Future<void> updateTodayStart(String historicalDocId) {
     return historicalRef.document(historicalDocId).updateData({"start": getHour()});
   }
+
+  @override
+  Future<void> updateRegistWithEnd(String historicalDocId, String hour) {
+    return historicalRef.document(historicalDocId).updateData({"end": hour});
+  }
+
+  @override
+  Future<void> updateRegistWithStart(String historicalDocId, String hour) {
+    return historicalRef.document(historicalDocId).updateData({"start": hour});
+  }
+
+  @override
+  Future<HistoricalEntry> getRegistByDate(String userDocId, DateTime date) async{
+    DateTime dateToCompare = DateTime(date.year, date.month, date.day);
+    HistoricalEntry result = null;
+    await historicalRef.where("user", isEqualTo: userDocId)
+    .where("date", isEqualTo: dateToCompare)
+        .getDocuments()
+        .then((QuerySnapshot snapshot) => {
+      snapshot.documents.forEach((f) {
+        result = HistoricalEntry(f.documentID, f.data["date"], f.data["start"], f.data["end"]);
+      })
+    });
+    return result;
+  }
+
+
+
 }

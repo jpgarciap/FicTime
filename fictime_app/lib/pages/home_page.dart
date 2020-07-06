@@ -4,6 +4,7 @@ import 'package:fictime/utils/colors.dart';
 import 'package:fictime/services/firestoreService.dart';
 import 'package:fictime/model/historicalEntry.dart';
 import 'package:fictime/utils/historicaUtils.dart';
+import 'package:fictime/pages/incidence_page.dart';
 import 'dart:async';
 
 class HomePage extends StatefulWidget {
@@ -221,9 +222,16 @@ class _HomePageState extends State<HomePage> {
                   Text(' Incidence', style: new TextStyle(fontSize: 25.0, color: Colors.black))
                 ]
             ),
-            onPressed: () => {},
+            onPressed: pushIncidence,
           ),
         )
+    );
+  }
+
+  void pushIncidence() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => new IncidencePage(userDocId: _userDocId)),
     );
   }
 
