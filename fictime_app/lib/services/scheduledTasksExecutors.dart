@@ -1,7 +1,5 @@
 import 'package:fictime/model/historicalEntry.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:fictime/model/ScheduledTaskType.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fictime/helpers/notificationHelper.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
