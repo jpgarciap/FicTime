@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fictime/model/historicalEntry.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:fictime/model/userData.dart';
 
 abstract class FirestoreService {
   Future<List<HistoricalEntry>> getHistoricals(String userDocId);
   Future<String> getUserDocId(String email);
+  Future<UserData> getUserData(String email);
   Future<void> addNewStart(String userDocId);
   Future<void> addNewEnd(String userDocId);
   Future<void> addNewStartWithDate(String userDocId, DateTime dateTime);
@@ -21,6 +22,9 @@ abstract class FirestoreService {
 class FirestoreServiceImpl implements FirestoreService {
   CollectionReference userRef = Firestore.instance.collection('users');
   CollectionReference historicalRef = Firestore.instance.collection('historicals');
+  CollectionReference officesRef = Firestore.instance.collection('offices');
+  CollectionReference workShiftRef = Firestore.instance.collection('workShifts');
+
 
   Future<List<HistoricalEntry>> getHistoricals(String userDocId) async {
     final List<HistoricalEntry> result = new List<HistoricalEntry>();
@@ -35,6 +39,41 @@ class FirestoreServiceImpl implements FirestoreService {
         });
     return result;
   }
+
+  Future<UserData> getUserData(String email) async{
+    UserData userData = new UserData();
+    String officeDocId;
+    String workShiftDocId;
+    await userRef.where("email", isEqualTo: email)
+        .getDocuments()
+        .then((QuerySnapshot snapshot) => {
+      snapshot.documents.forEach((userDoc) {
+        userData.updateUserDocId(userDoc.documentID);
+        officeDocId = userDoc.data["office"];
+        workShiftDocId = userDoc.data["workShift"];
+
+      })
+    });
+    await addCoordinates(userData, officeDocId);
+    await addWorkShift(userData, workShiftDocId);
+    return userData;
+  }
+
+  Future<void> addCoordinates(UserData userData, String officeDocId) async{
+    await officesRef.document(officeDocId).get().then((officeDoc) {
+        double lat = officeDoc.data['coordinates']['lat'];
+        double lng = officeDoc.data['coordinates']['lng'];
+        userData.updateCoordinates(lat, lng);
+    });
+  }
+
+  Future<void> addWorkShift(UserData userData, String workShiftId) async {
+    await workShiftRef.document(workShiftId).get().then((workShiftDoc) =>
+        userData.updateWorkShift(workShiftDoc.data["startTime"], workShiftDoc.data["endTime"])
+    );
+  }
+
+
 
   Future<String> getUserDocId(String email) async {
     String userDocId = "";
@@ -100,7 +139,7 @@ class FirestoreServiceImpl implements FirestoreService {
   @override
   Future<HistoricalEntry> getRegistByDate(String userDocId, DateTime date) async{
     DateTime dateToCompare = DateTime(date.year, date.month, date.day);
-    HistoricalEntry result = null;
+    HistoricalEntry result;
     await historicalRef.where("user", isEqualTo: userDocId)
     .where("date", isEqualTo: dateToCompare)
         .getDocuments()
@@ -111,7 +150,5 @@ class FirestoreServiceImpl implements FirestoreService {
     });
     return result;
   }
-
-
 
 }

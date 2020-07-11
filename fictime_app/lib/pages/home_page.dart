@@ -5,7 +5,13 @@ import 'package:fictime/services/firestoreService.dart';
 import 'package:fictime/model/historicalEntry.dart';
 import 'package:fictime/utils/historicaUtils.dart';
 import 'package:fictime/pages/incidence_page.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'dart:async';
+import 'package:geolocator/geolocator.dart';
+
+
+const int taskNumber = 3;
+const int periodicityInMinutes = 30;
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.auth, this.userId, this.logoutCallback});
@@ -23,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FirestoreService firestoreService = new FirestoreServiceImpl();
   List<HistoricalEntry> registers = new List<HistoricalEntry>();
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
   String _userDocId;
   bool _isLoading;
   bool _hasStartToday;
@@ -57,13 +64,20 @@ class _HomePageState extends State<HomePage> {
                         onPressed: signOut),
                   ],
                 ),
-                body: Stack(
-                  children: <Widget>[
-                    snapshot.hasData
-                        ? _showForm(snapshot.data)
-                        : _showCircularProgress(true)
-                  ],
-                )));
+                body: SmartRefresher(
+                  child: Stack(
+                    children: <Widget>[
+                      snapshot.hasData
+                          ? _showForm(snapshot.data)
+                          : _showCircularProgress(true)
+                    ],
+                  ),
+                  controller: _refreshController,
+                  onRefresh: loadHistoricals,
+                  onLoading: loadHistoricals,
+                )
+            )
+    );
   }
 
   Widget _showForm(List<HistoricalEntry> historicals) {
@@ -231,8 +245,21 @@ class _HomePageState extends State<HomePage> {
   void pushIncidence() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => new IncidencePage(userDocId: _userDocId)),
-    );
+      MaterialPageRoute(builder: (context) => new IncidencePage(userDocId: _userDocId)));
+  }
+
+  void loadHistoricals() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    registers = await findHistoricals();
+    _hasStartToday = HistoricalUtils.hasStartToday(registers);
+    _hasEndToday = HistoricalUtils.hasEndToday(registers);
+    setState(() {
+      _isLoading = false;
+    });
+    _refreshController.refreshCompleted();
   }
 
   signOut() async {
@@ -253,4 +280,5 @@ class _HomePageState extends State<HomePage> {
       width: 0.0,
     );
   }
+
 }

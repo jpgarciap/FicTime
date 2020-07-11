@@ -37,7 +37,6 @@ class Auth implements BaseAuth {
     return _firebaseAuth.signOut();
   }
 
-
   Future<void> sendPasswordResetEmail(String email) async {
     return _firebaseAuth.sendPasswordResetEmail(email: email);
   }

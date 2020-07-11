@@ -38,4 +38,9 @@ class HistoricalEntry {
   String getDocId(){
     return this.docId;
   }
+
+  @override
+  String toString() {
+    return 'HistoricalEntry{docId: $docId, date: $date, start: $start, end: $end}';
+  }
 }
