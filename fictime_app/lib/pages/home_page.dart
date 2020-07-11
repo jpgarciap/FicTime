@@ -7,7 +7,6 @@ import 'package:fictime/utils/historicaUtils.dart';
 import 'package:fictime/pages/incidence_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'dart:async';
-import 'package:geolocator/geolocator.dart';
 
 
 const int taskNumber = 3;
@@ -28,7 +27,7 @@ class _HomePageState extends State<HomePage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FirestoreService firestoreService = new FirestoreServiceImpl();
-  List<HistoricalEntry> registers = new List<HistoricalEntry>();
+  List<HistoricalEntry> _registers = new List<HistoricalEntry>();
   RefreshController _refreshController = RefreshController(initialRefresh: false);
   String _userDocId;
   bool _isLoading;
@@ -65,6 +64,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 body: SmartRefresher(
+                  enablePullUp: true,
                   child: Stack(
                     children: <Widget>[
                       snapshot.hasData
@@ -74,14 +74,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                   controller: _refreshController,
                   onRefresh: loadHistoricals,
-                  onLoading: loadHistoricals,
                 )
             )
     );
   }
 
   Widget _showForm(List<HistoricalEntry> historicals) {
-    registers = historicals;
+    _registers = historicals;
     _hasStartToday = HistoricalUtils.hasStartToday(historicals);
     _hasEndToday = HistoricalUtils.hasEndToday(historicals);
     _showCircularProgress(false);
@@ -134,7 +133,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void registStart() async{
-   HistoricalEntry todayEntry = HistoricalUtils.todayEntry(registers);
+   HistoricalEntry todayEntry = HistoricalUtils.todayEntry(_registers);
    setState(() {
      _isLoading = true;
    });
@@ -149,7 +148,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void registEnd() async{
-    HistoricalEntry todayEntry = HistoricalUtils.todayEntry(registers);
+    HistoricalEntry todayEntry = HistoricalUtils.todayEntry(_registers);
     setState(() {
       _isLoading = true;
     });
@@ -208,7 +207,7 @@ class _HomePageState extends State<HomePage> {
 
   List<DataRow> getRows(){
     List<DataRow> rows = new List<DataRow>();
-    for (HistoricalEntry entry in registers){
+    for (HistoricalEntry entry in _registers){
       DataRow row = DataRow(cells: [
         DataCell(Text(entry.getDateFormat())),
         DataCell(Text(entry.getStart())),
@@ -249,15 +248,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void loadHistoricals() async {
+    List<HistoricalEntry> updatedRegisters = await findHistoricals();
     setState(() {
-      _isLoading = true;
-    });
-
-    registers = await findHistoricals();
-    _hasStartToday = HistoricalUtils.hasStartToday(registers);
-    _hasEndToday = HistoricalUtils.hasEndToday(registers);
-    setState(() {
-      _isLoading = false;
+      _registers = updatedRegisters;
+      _hasStartToday = HistoricalUtils.hasStartToday(_registers);
+      _hasEndToday = HistoricalUtils.hasEndToday(_registers);
     });
     _refreshController.refreshCompleted();
   }
