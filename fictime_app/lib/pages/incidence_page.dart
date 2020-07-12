@@ -7,8 +7,9 @@ import 'package:fictime/utils/colors.dart';
 import 'package:fictime/model/historicalEntry.dart';
 
 class IncidencePage extends StatefulWidget {
-  IncidencePage({Key key, this.userDocId});
+  IncidencePage({Key key, this.userDocId, this.firestoreService});
 
+  final FirestoreService firestoreService;
   final String userDocId;
 
   @override
@@ -17,7 +18,6 @@ class IncidencePage extends StatefulWidget {
 
 class _IncidencePageState extends State<IncidencePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final FirestoreService firestoreService = new FirestoreServiceImpl();
   String _errorMessage;
   bool _isLoading;
   String selectedDateStr;
@@ -80,11 +80,11 @@ class _IncidencePageState extends State<IncidencePage> {
                   showTitleActions: true,
                   minTime: DateTime(2018, 3, 5),
                   maxTime: DateTime(2019, 6, 7), onChanged: (date) {
-                setState(() {
-                  selectedDateStr = DateFormat('dd/MM/yyyy - HH:mm').format(date);
-                  selectedDate = date;
-                });
-              }, currentTime: DateTime.now(), locale: LocaleType.en);
+                    setState(() {
+                      selectedDateStr = DateFormat('dd/MM/yyyy - HH:mm').format(date);
+                      selectedDate = date;
+                    });
+                  }, currentTime: DateTime.now(), locale: LocaleType.en);
             },
           ),
         ));
@@ -171,8 +171,7 @@ class _IncidencePageState extends State<IncidencePage> {
     setState(() {
       _isLoading = true;
     });
-    HistoricalEntry entry =
-        await firestoreService.getRegistByDate(widget.userDocId, selectedDate);
+    HistoricalEntry entry = await widget.firestoreService.getRegistByDate(widget.userDocId, selectedDate);
     if (entry == null) {
       addnewRegist();
       successRegist();
@@ -196,10 +195,10 @@ class _IncidencePageState extends State<IncidencePage> {
       _errorMessage = "You already have a registration for this day";
     } else {
       if (selectedCheckBox == "Start") {
-        await firestoreService.updateRegistWithStart(
+        await widget.firestoreService.updateRegistWithStart(
             entry.getDocId(), getSelectedHour());
       } else {
-        await firestoreService.updateRegistWithEnd(
+        await widget.firestoreService.updateRegistWithEnd(
             entry.getDocId(), getSelectedHour());
       }
       successRegist();
@@ -212,10 +211,10 @@ class _IncidencePageState extends State<IncidencePage> {
 
   void addnewRegist() async {
     if (selectedCheckBox == "Start") {
-      await firestoreService.addNewStartWithDate(
+      await widget.firestoreService.addNewStartWithDate(
           widget.userDocId, selectedDate);
     } else {
-      await firestoreService.addNewEndWithDate(widget.userDocId, selectedDate);
+      await widget.firestoreService.addNewEndWithDate(widget.userDocId, selectedDate);
     }
   }
 

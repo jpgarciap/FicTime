@@ -13,8 +13,9 @@ const int taskNumber = 3;
 const int periodicityInMinutes = 30;
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.auth, this.userId, this.logoutCallback});
+  HomePage({Key key, this.firestoreService, this.auth, this.userId, this.logoutCallback});
 
+  final FirestoreService firestoreService;
   final BaseAuth auth;
   final VoidCallback logoutCallback;
   final String userId;
@@ -26,7 +27,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final FirestoreService firestoreService = new FirestoreServiceImpl();
   List<HistoricalEntry> _registers = new List<HistoricalEntry>();
   RefreshController _refreshController = RefreshController(initialRefresh: false);
   String _userDocId;
@@ -43,8 +43,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<HistoricalEntry>> findHistoricals() async {
     String email = await widget.auth.getEmail();
-    _userDocId = await firestoreService.getUserDocId(email);
-    return await firestoreService.getHistoricals(_userDocId);
+    _userDocId = await widget.firestoreService.getUserDocId(email);
+    return await widget.firestoreService.getHistoricals(_userDocId);
   }
 
   @override
@@ -52,30 +52,30 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder<List<HistoricalEntry>>(
         future: findHistoricals(),
         builder: (BuildContext context,
-                AsyncSnapshot<List<HistoricalEntry>> snapshot) =>
-            new Scaffold(
-                appBar: new AppBar(
-                  title: new Text("FicTime"),
-                  actions: <Widget>[
-                    IconButton(
-                        icon: Icon(Icons.exit_to_app),
-                        tooltip: 'Exit',
-                        onPressed: signOut),
-                  ],
-                ),
-                body: SmartRefresher(
-                  enablePullUp: true,
-                  child: Stack(
-                    children: <Widget>[
-                      snapshot.hasData
-                          ? _showForm(snapshot.data)
-                          : _showCircularProgress(true)
-                    ],
-                  ),
-                  controller: _refreshController,
-                  onRefresh: loadHistoricals,
-                )
+            AsyncSnapshot<List<HistoricalEntry>> snapshot) =>
+        new Scaffold(
+            appBar: new AppBar(
+              title: new Text("FicTime"),
+              actions: <Widget>[
+                IconButton(
+                    icon: Icon(Icons.exit_to_app),
+                    tooltip: 'Exit',
+                    onPressed: signOut),
+              ],
+            ),
+            body: SmartRefresher(
+              enablePullUp: true,
+              child: Stack(
+                children: <Widget>[
+                  snapshot.hasData
+                      ? _showForm(snapshot.data)
+                      : _showCircularProgress(true)
+                ],
+              ),
+              controller: _refreshController,
+              onRefresh: loadHistoricals,
             )
+        )
     );
   }
 
@@ -105,13 +105,13 @@ class _HomePageState extends State<HomePage> {
     return new Padding(
         padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
         child: SizedBox(
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                startButton(),
-                endButton()
-              ]
-          )
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  startButton(),
+                  endButton()
+                ]
+            )
         )
     );
   }
@@ -120,43 +120,33 @@ class _HomePageState extends State<HomePage> {
     return ButtonTheme(
         minWidth: 160.0,
         height: 50.0,
-      child: RaisedButton(
-          elevation: 5.0,
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(10.0)),
-          color: Colors.green,
-          child:
+        child: RaisedButton(
+            elevation: 5.0,
+            shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(10.0)),
+            color: Colors.green,
+            child:
             Text(' Start', style: new TextStyle(fontSize: 25.0, color: Colors.black)),
-          onPressed: !_hasStartToday && !_hasEndToday ? registStart : null
-      )
+            onPressed: !_hasStartToday && !_hasEndToday ? registStart : null
+        )
     );
   }
 
   void registStart() async{
-   HistoricalEntry todayEntry = HistoricalUtils.todayEntry(_registers);
-   setState(() {
-     _isLoading = true;
-   });
-   if (todayEntry == null) {
-     await firestoreService.addNewStart(_userDocId);
-   } else{
-     await firestoreService.updateTodayStart(todayEntry.getDocId());
-   }
-   setState(() {
-     _isLoading = false;
-   });
-  }
-
-  void registEnd() async{
-    HistoricalEntry todayEntry = HistoricalUtils.todayEntry(_registers);
     setState(() {
       _isLoading = true;
     });
-    if (todayEntry == null) {
-      await firestoreService.addNewEnd(_userDocId);
-    } else{
-      await firestoreService.updateTodayEnd(todayEntry.getDocId());
-    }
+    await widget.firestoreService.registStart(_userDocId, _registers);
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void registEnd() async{
+    setState(() {
+      _isLoading = true;
+    });
+    await widget.firestoreService.registEnd(_userDocId, _registers);
     setState(() {
       _isLoading = false;
     });
@@ -180,28 +170,28 @@ class _HomePageState extends State<HomePage> {
 
   Widget _table() {
     return new Padding(
-      padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
-      child: DataTable(columns: const <DataColumn>[
-        DataColumn(
-          label: Text(
-            'Date',
-            style: TextStyle(fontStyle: FontStyle.italic),
+        padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
+        child: DataTable(columns: const <DataColumn>[
+          DataColumn(
+            label: Text(
+              'Date',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
           ),
-        ),
-        DataColumn(
-          label: Text(
-            'Start',
-            style: TextStyle(fontStyle: FontStyle.italic),
+          DataColumn(
+            label: Text(
+              'Start',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
           ),
-        ),
-        DataColumn(
-          label: Text(
-            'End',
-            style: TextStyle(fontStyle: FontStyle.italic),
+          DataColumn(
+            label: Text(
+              'End',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
           ),
-        ),
-      ], rows: getRows()
-      )
+        ], rows: getRows()
+        )
     );
   }
 
@@ -243,8 +233,8 @@ class _HomePageState extends State<HomePage> {
 
   void pushIncidence() {
     Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => new IncidencePage(userDocId: _userDocId)));
+        context,
+        MaterialPageRoute(builder: (context) => new IncidencePage(userDocId: _userDocId, firestoreService: widget.firestoreService)));
   }
 
   void loadHistoricals() async {

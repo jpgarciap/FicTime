@@ -6,6 +6,7 @@ import 'package:fictime/model/userData.dart';
 import 'package:fictime/model/ScheduledTaskType.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:fictime/services/firestoreService.dart';
+import 'package:fictime/repository/firestoreRepository.dart';
 
 enum AuthStatus {
   NOT_DETERMINED,
@@ -27,10 +28,9 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
-  FirestoreService firestoreService = new FirestoreServiceImpl();
+  FirestoreService firestoreService = new FirestoreServiceImpl(new FirestoreRepositoryImpl());
   String _userId = "";
   String _email = "";
-  UserData _userData;
 
   @override
   void initState() {
@@ -64,7 +64,6 @@ class _RootPageState extends State<RootPage> {
       authStatus = AuthStatus.NOT_LOGGED_IN;
       _userId = "";
       _email = "";
-      _userData = null;
     });
   }
 
@@ -87,23 +86,20 @@ class _RootPageState extends State<RootPage> {
         return new LoginSignupPage(
           auth: widget.auth,
           loginCallback: loginCallback,
+          firestoreService: firestoreService,
         );
         break;
       case AuthStatus.LOGGED_IN:
         if (_userId.length > 0 && _userId != null) {
           firestoreService.getUserData(_email).then((currentUserData) {
-            if (currentUserData != _userData){
-              Workmanager.cancelAll().then((value) {
-                initReminderStartTasks(currentUserData);
-                initReminderEndTasks(currentUserData);
-                _userData = currentUserData;
-              });
-            }
+                //initReminderStartTasks(currentUserData);
+                //initReminderEndTasks(currentUserData);
           });
           return new HomePage(
             userId: _userId,
             auth: widget.auth,
             logoutCallback: logoutCallback,
+            firestoreService: firestoreService,
           );
         } else
           return buildWaitingScreen();
@@ -113,11 +109,12 @@ class _RootPageState extends State<RootPage> {
     }
   }
 
-  void initReminderStartTasks(UserData userData) {
+  void initReminderStartTasks(UserData userData) async{
+    int taskNumber = 0;
     for (int delay
-        in userData.calculateStartDelays(taskNumber, periodicityInMinutes)) {
-      Workmanager.registerPeriodicTask(
-          "start-" + delay.toString(), START_REMINDER,
+        in userData.calculateStartDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+      await Workmanager.registerPeriodicTask(
+          "start-" + taskNumber.toString(), START_REMINDER,
           frequency: Duration(hours: 24),
           initialDelay: Duration(seconds: delay),
           constraints: Constraints(networkType: NetworkType.connected),
@@ -126,13 +123,15 @@ class _RootPageState extends State<RootPage> {
             'lat': userData.getLat(),
             'lng': userData.getLng()
           });
+      taskNumber++;
     }
   }
 
-  void initReminderEndTasks(UserData userData) {
+  void initReminderEndTasks(UserData userData) async {
+    int taskNumber = 0;
     for (int delay
-        in userData.calculateEndDelays(taskNumber, periodicityInMinutes)) {
-      Workmanager.registerPeriodicTask("end-" + delay.toString(), END_REMINDER,
+        in userData.calculateEndDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+      await Workmanager.registerPeriodicTask("end-" + taskNumber.toString(), END_REMINDER,
           frequency: Duration(hours: 24),
           initialDelay: Duration(seconds: delay),
           constraints: Constraints(networkType: NetworkType.connected),

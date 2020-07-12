@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fictime/services/authentication.dart';
+import 'package:fictime/services/firestoreService.dart';
 import 'package:fictime/utils/colors.dart';
 import 'package:fictime/pages/forget_password.dart';
 import 'package:fictime/pages/request_account_page.dart';
 
 
 class LoginSignupPage extends StatefulWidget {
-  LoginSignupPage({this.auth, this.loginCallback});
+  LoginSignupPage({this.auth, this.loginCallback, this.firestoreService});
 
   final BaseAuth auth;
   final VoidCallback loginCallback;
+  final FirestoreService firestoreService;
   @override
   State<StatefulWidget> createState() => new _LoginSignupPageState();
 
@@ -71,7 +73,7 @@ class _LoginSignupPageState extends State<LoginSignupPage>{
   void pushRequestAccount() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => new RequestAccountPage()),
+      MaterialPageRoute(builder: (context) => new RequestAccountPage(firestoreService: widget.firestoreService)),
     );
   }
 
@@ -209,7 +211,7 @@ class _LoginSignupPageState extends State<LoginSignupPage>{
 
   Widget requestAccountButton() {
     return new FlatButton(
-        child: new Text( 'Request  an account',
+        child: new Text( 'Request an account',
             style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.w300)),
         onPressed: pushRequestAccount);
   }

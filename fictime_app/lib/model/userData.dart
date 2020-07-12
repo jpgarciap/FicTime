@@ -45,14 +45,14 @@ class UserData {
     return 'UserData{userDocId: $_userDocId, lat: $_lat, lng: $_lng, start: $_start, end: $_end}';
   }
 
-  List<int> calculateStartDelays(int taskNumber, int periodicityInMinutes){
+  List<int> calculateStartDelaysInSeconds(int taskNumber, int periodicityInMinutes){
     if (this._start.isEmpty){
       return new List();
     }
     return _calculateDelays(_dateFromStart(), taskNumber, periodicityInMinutes);
   }
 
-  List<int> calculateEndDelays(int taskNumber, int periodicityInMinutes) {
+  List<int> calculateEndDelaysInSeconds(int taskNumber, int periodicityInMinutes) {
     if (this._end.isEmpty) {
       return new List();
     }

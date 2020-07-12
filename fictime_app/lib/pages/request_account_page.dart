@@ -1,8 +1,10 @@
+import 'package:fictime/services/firestoreService.dart';
 import 'package:flutter/material.dart';
 import 'package:fictime/utils/colors.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RequestAccountPage extends StatefulWidget{
+  RequestAccountPage({this.firestoreService});
+  final FirestoreService firestoreService;
 
   State<StatefulWidget> createState() => new _RequestAccountPage();
 }
@@ -81,7 +83,7 @@ class _RequestAccountPage extends State<RequestAccountPage>{
         setState(() {
           _isLoading = true;
         });
-        Firestore.instance.collection('accounts').document().setData({"email": _email, "description": _description, "date": new DateTime.now()});
+        await widget.firestoreService.addRequestAccount(_email, _description);
         setState(() {
           _isLoading = false;
         });
