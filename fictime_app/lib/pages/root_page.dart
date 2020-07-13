@@ -6,7 +6,6 @@ import 'package:fictime/model/userData.dart';
 import 'package:fictime/model/ScheduledTaskType.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:fictime/services/firestoreService.dart';
-import 'package:fictime/repository/firestoreRepository.dart';
 
 enum AuthStatus {
   NOT_DETERMINED,
@@ -18,8 +17,8 @@ const int taskNumber = 3;
 const int periodicityInMinutes = 30;
 
 class RootPage extends StatefulWidget {
-  RootPage({this.auth});
-
+  RootPage({this.auth, this.firestoreService});
+  final FirestoreService firestoreService;
   final BaseAuth auth;
 
   @override
@@ -28,7 +27,6 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
-  FirestoreService firestoreService = new FirestoreServiceImpl(new FirestoreRepositoryImpl());
   String _userId = "";
   String _email = "";
 
@@ -42,7 +40,7 @@ class _RootPageState extends State<RootPage> {
           _email = user?.email;
         }
         authStatus =
-            user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+        user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
       });
     });
   }
@@ -86,20 +84,20 @@ class _RootPageState extends State<RootPage> {
         return new LoginSignupPage(
           auth: widget.auth,
           loginCallback: loginCallback,
-          firestoreService: firestoreService,
+          firestoreService: widget.firestoreService,
         );
         break;
       case AuthStatus.LOGGED_IN:
         if (_userId.length > 0 && _userId != null) {
-          firestoreService.getUserData(_email).then((currentUserData) {
-                //initReminderStartTasks(currentUserData);
-                //initReminderEndTasks(currentUserData);
+          widget.firestoreService.getUserData(_email).then((currentUserData) {
+            initReminderStartTasks(currentUserData);
+            initReminderEndTasks(currentUserData);
           });
           return new HomePage(
             userId: _userId,
             auth: widget.auth,
             logoutCallback: logoutCallback,
-            firestoreService: firestoreService,
+            firestoreService: widget.firestoreService,
           );
         } else
           return buildWaitingScreen();
@@ -112,7 +110,7 @@ class _RootPageState extends State<RootPage> {
   void initReminderStartTasks(UserData userData) async{
     int taskNumber = 0;
     for (int delay
-        in userData.calculateStartDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+    in userData.calculateStartDelaysInSeconds(taskNumber, periodicityInMinutes)) {
       await Workmanager.registerPeriodicTask(
           "start-" + taskNumber.toString(), START_REMINDER,
           frequency: Duration(hours: 24),
@@ -130,7 +128,7 @@ class _RootPageState extends State<RootPage> {
   void initReminderEndTasks(UserData userData) async {
     int taskNumber = 0;
     for (int delay
-        in userData.calculateEndDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+    in userData.calculateEndDelaysInSeconds(taskNumber, periodicityInMinutes)) {
       await Workmanager.registerPeriodicTask("end-" + taskNumber.toString(), END_REMINDER,
           frequency: Duration(hours: 24),
           initialDelay: Duration(seconds: delay),

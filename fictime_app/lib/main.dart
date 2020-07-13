@@ -7,6 +7,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fictime/services/scheduledTasksExecutors.dart';
 import 'package:fictime/helpers/notificationHelper.dart';
 import 'package:fictime/model/ScheduledTaskType.dart';
+import 'package:fictime/services/firestoreService.dart';
+import 'package:fictime/repository/firestoreRepository.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -30,14 +34,26 @@ void callbackDispatcher() {
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   notificationAppLaunchDetails =
-      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   await initNotifications(flutterLocalNotificationsPlugin);
   Workmanager.initialize(callbackDispatcher);
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget{
 
+  @override
+  _MyApp createState() => _MyApp();
+}
+
+class _MyApp extends State<MyApp> {
+  FirestoreService firestoreService = new FirestoreServiceImpl(new FirestoreRepositoryImpl(Firestore.instance));
+
+  @override
+  void initState(){
+    super.initState();
+    _askPermission();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +63,16 @@ class MyApp extends StatelessWidget {
         theme: new ThemeData(
           primarySwatch: WatermelonColor.getColor(),
         ),
-        home: new RootPage(auth: new Auth())
+        home: new RootPage(auth: new Auth(), firestoreService: firestoreService)
     );
+  }
+
+  _askPermission() async {
+    Permission permission = Permission.locationAlways;
+    PermissionStatus status = await permission.status;
+    if (status.isUndetermined) {
+        await permission.request();
+    }
   }
 
 }

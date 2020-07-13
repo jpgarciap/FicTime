@@ -71,6 +71,7 @@ class _ForgetPasswordPage extends State<ForgetPasswordPage>{
       padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
       child: new TextFormField(
         maxLines: 1,
+        key: Key("email-field"),
         keyboardType: TextInputType.emailAddress,
         autofocus: false,
         decoration: new InputDecoration(

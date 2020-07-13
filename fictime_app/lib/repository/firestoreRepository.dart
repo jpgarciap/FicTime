@@ -21,15 +21,12 @@ abstract class FirestoreRepository {
 }
 
 class FirestoreRepositoryImpl implements FirestoreRepository {
-  CollectionReference userRef = Firestore.instance.collection('users');
-  CollectionReference historicalRef = Firestore.instance.collection('historicals');
-  CollectionReference officesRef = Firestore.instance.collection('offices');
-  CollectionReference workShiftRef = Firestore.instance.collection('workShifts');
-
+  FirestoreRepositoryImpl(this.firestore);
+  final Firestore firestore;
 
   Future<List<HistoricalEntry>> getHistoricals(String userDocId) async {
     final List<HistoricalEntry> result = new List<HistoricalEntry>();
-    await historicalRef.where("user", isEqualTo: userDocId)
+    await firestore.collection('historicals').where("user", isEqualTo: userDocId)
         .orderBy("date", descending: true)
         .limit(7)
         .getDocuments()
@@ -45,7 +42,7 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
     UserData userData = new UserData();
     String officeDocId;
     String workShiftDocId;
-    await userRef.where("email", isEqualTo: email)
+    await firestore.collection('users').where("email", isEqualTo: email)
         .getDocuments()
         .then((QuerySnapshot snapshot) => {
       snapshot.documents.forEach((userDoc) {
@@ -55,31 +52,26 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
 
       })
     });
-    await _addCoordinates(userData, officeDocId);
     await _addWorkShift(userData, workShiftDocId);
+    await _addCoordinates(userData, officeDocId);
     return userData;
   }
 
   Future<void> _addCoordinates(UserData userData, String officeDocId) async{
-    await officesRef.document(officeDocId).get().then((officeDoc) {
-      var coordinates = officeDoc.data["coordinates"];
-      double lat = coordinates["lat"];
-      double lng = coordinates["lng"];
-      userData.updateCoordinates(lat, lng);
-    });
+    return await firestore.collection('offices').document(officeDocId).get().then((officeDoc) =>
+        userData.updateCoordinates(officeDoc.data["coordinates"]["lat"], officeDoc.data["coordinates"]["lng"])
+    );
   }
 
   Future<void> _addWorkShift(UserData userData, String workShiftId) async {
-    await workShiftRef.document(workShiftId).get().then((workShiftDoc) =>
+    return await firestore.collection('workShifts').document(workShiftId).get().then((workShiftDoc) =>
         userData.updateWorkShift(workShiftDoc.data["startTime"], workShiftDoc.data["endTime"])
     );
   }
 
-
-
   Future<String> getUserDocId(String email) async {
     String userDocId = "";
-    await userRef.where("email", isEqualTo: email)
+    await firestore.collection('users').where("email", isEqualTo: email)
         .getDocuments()
         .then((QuerySnapshot snapshot) => {
       snapshot.documents.forEach((f) { userDocId = f.documentID; })
@@ -89,13 +81,13 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
 
   @override
   Future<void> addNewEnd(String userDocId) async {
-    return historicalRef.document().setData({"date": getDate(), "user": userDocId, "end": getHour()});
+    return firestore.collection('historicals').document().setData({"date": getDate(), "user": userDocId, "end": getHour()});
   }
 
   @override
   Future<void> addNewEndWithDate(String userDocId, DateTime date) async {
     DateTime dateToAdd = DateTime(date.year, date.month, date.day);
-    return historicalRef.document().setData({"date": dateToAdd, "user": userDocId, "end": getHour()});
+    return firestore.collection('historicals').document().setData({"date": dateToAdd, "user": userDocId, "end": getHour()});
   }
 
   String getHour(){
@@ -109,40 +101,40 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
 
   @override
   Future<void> addNewStart(String userDocId) async{
-    return historicalRef.document().setData({"date": getDate(), "user": userDocId, "start": getHour()});
+    return firestore.collection('historicals').document().setData({"date": getDate(), "user": userDocId, "start": getHour()});
   }
 
   @override
   Future<void> addNewStartWithDate(String userDocId,  DateTime date) async{
     DateTime dateToAdd = DateTime(date.year, date.month, date.day);
-    return historicalRef.document().setData({"date": dateToAdd, "user": userDocId, "start": getHour()});
+    return firestore.collection('historicals').document().setData({"date": dateToAdd, "user": userDocId, "start": getHour()});
   }
 
   @override
   Future<void> updateTodayEnd(String historicalDocId) {
-    return historicalRef.document(historicalDocId).updateData({"end": getHour()});
+    return firestore.collection('historicals').document(historicalDocId).updateData({"end": getHour()});
   }
 
   @override
   Future<void> updateTodayStart(String historicalDocId) {
-    return historicalRef.document(historicalDocId).updateData({"start": getHour()});
+    return firestore.collection('historicals').document(historicalDocId).updateData({"start": getHour()});
   }
 
   @override
   Future<void> updateRegistWithEnd(String historicalDocId, String hour) {
-    return historicalRef.document(historicalDocId).updateData({"end": hour});
+    return firestore.collection('historicals').document(historicalDocId).updateData({"end": hour});
   }
 
   @override
   Future<void> updateRegistWithStart(String historicalDocId, String hour) {
-    return historicalRef.document(historicalDocId).updateData({"start": hour});
+    return firestore.collection('historicals').document(historicalDocId).updateData({"start": hour});
   }
 
   @override
   Future<HistoricalEntry> getRegistByDate(String userDocId, DateTime date) async{
     DateTime dateToCompare = DateTime(date.year, date.month, date.day);
     HistoricalEntry result;
-    await historicalRef.where("user", isEqualTo: userDocId)
+    await firestore.collection('historicals').where("user", isEqualTo: userDocId)
         .where("date", isEqualTo: dateToCompare)
         .getDocuments()
         .then((QuerySnapshot snapshot) => {
@@ -154,8 +146,8 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   @override
-  Future<void> addRequestAccount(String email, String description){
-    return Firestore.instance.collection('accounts').document().setData({"email": email, "description": description, "date": new DateTime.now()});
+  Future<void> addRequestAccount(String email, String description) async {
+    return await firestore.collection('accounts').document().setData({"email": email, "description": description, "date": new DateTime.now()});
   }
 
 }

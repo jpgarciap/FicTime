@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fictime/services/authentication.dart';
 import 'package:fictime/utils/colors.dart';
@@ -121,6 +122,7 @@ class _HomePageState extends State<HomePage> {
         minWidth: 160.0,
         height: 50.0,
         child: RaisedButton(
+            key : Key("startBtn"),
             elevation: 5.0,
             shape: new RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(10.0)),
@@ -157,6 +159,7 @@ class _HomePageState extends State<HomePage> {
         minWidth: 160.0,
         height: 50.0,
         child: RaisedButton(
+            key : Key("endBtn"),
             elevation: 5.0,
             shape: new RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(10.0)),
@@ -171,8 +174,9 @@ class _HomePageState extends State<HomePage> {
   Widget _table() {
     return new Padding(
         padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
-        child: DataTable(columns: const <DataColumn>[
-          DataColumn(
+        child:
+          DataTable(columns: const <DataColumn>[
+            DataColumn(
             label: Text(
               'Date',
               style: TextStyle(fontStyle: FontStyle.italic),

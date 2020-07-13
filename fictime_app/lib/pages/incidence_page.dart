@@ -64,6 +64,7 @@ class _IncidencePageState extends State<IncidencePage> {
         child: SizedBox(
           height: 50.0,
           child: new RaisedButton(
+            key: Key('dateBtn'),
             elevation: 5.0,
             shape: new RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(10.0)),
@@ -163,8 +164,9 @@ class _IncidencePageState extends State<IncidencePage> {
       setState(() {
         _errorMessage = "You must select start/end";
       });
+    } else{
+      trySubmit();
     }
-    trySubmit();
   }
 
   void trySubmit() async {

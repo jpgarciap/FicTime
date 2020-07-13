@@ -128,6 +128,7 @@ class _RequestAccountPage extends State<RequestAccountPage>{
       padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
       child: new TextFormField(
         maxLines: 1,
+        key: Key("email-field"),
         keyboardType: TextInputType.emailAddress,
         autofocus: false,
         decoration: new InputDecoration(
@@ -146,6 +147,7 @@ class _RequestAccountPage extends State<RequestAccountPage>{
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: new TextFormField(
+        key: Key("description-field"),
         maxLines: 2,
         keyboardType: TextInputType.text,
         autofocus: false,
