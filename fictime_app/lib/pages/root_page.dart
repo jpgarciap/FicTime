@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fictime/pages/login_signup_page.dart';
 import 'package:fictime/services/authentication.dart';
 import 'package:fictime/pages/home_page.dart';
-import 'package:fictime/model/userData.dart';
-import 'package:fictime/model/ScheduledTaskType.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:fictime/services/firestoreService.dart';
 
@@ -12,9 +10,6 @@ enum AuthStatus {
   NOT_LOGGED_IN,
   LOGGED_IN,
 }
-
-const int taskNumber = 3;
-const int periodicityInMinutes = 30;
 
 class RootPage extends StatefulWidget {
   RootPage({this.auth, this.firestoreService});
@@ -28,7 +23,6 @@ class RootPage extends StatefulWidget {
 class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
   String _userId = "";
-  String _email = "";
 
   @override
   void initState() {
@@ -37,7 +31,6 @@ class _RootPageState extends State<RootPage> {
       setState(() {
         if (user != null) {
           _userId = user?.uid;
-          _email = user?.email;
         }
         authStatus =
         user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
@@ -61,7 +54,6 @@ class _RootPageState extends State<RootPage> {
     setState(() {
       authStatus = AuthStatus.NOT_LOGGED_IN;
       _userId = "";
-      _email = "";
     });
   }
 
@@ -89,10 +81,6 @@ class _RootPageState extends State<RootPage> {
         break;
       case AuthStatus.LOGGED_IN:
         if (_userId.length > 0 && _userId != null) {
-          widget.firestoreService.getUserData(_email).then((currentUserData) {
-            initReminderStartTasks(currentUserData);
-            initReminderEndTasks(currentUserData);
-          });
           return new HomePage(
             userId: _userId,
             auth: widget.auth,
@@ -104,40 +92,6 @@ class _RootPageState extends State<RootPage> {
         break;
       default:
         return buildWaitingScreen();
-    }
-  }
-
-  void initReminderStartTasks(UserData userData) async{
-    int taskNumber = 0;
-    for (int delay
-    in userData.calculateStartDelaysInSeconds(taskNumber, periodicityInMinutes)) {
-      await Workmanager.registerPeriodicTask(
-          "start-" + taskNumber.toString(), START_REMINDER,
-          frequency: Duration(hours: 24),
-          initialDelay: Duration(seconds: delay),
-          constraints: Constraints(networkType: NetworkType.connected),
-          inputData: <String, dynamic>{
-            'userDocId': userData.getUserDocId(),
-            'lat': userData.getLat(),
-            'lng': userData.getLng()
-          });
-      taskNumber++;
-    }
-  }
-
-  void initReminderEndTasks(UserData userData) async {
-    int taskNumber = 0;
-    for (int delay
-    in userData.calculateEndDelaysInSeconds(taskNumber, periodicityInMinutes)) {
-      await Workmanager.registerPeriodicTask("end-" + taskNumber.toString(), END_REMINDER,
-          frequency: Duration(hours: 24),
-          initialDelay: Duration(seconds: delay),
-          constraints: Constraints(networkType: NetworkType.connected),
-          inputData: <String, dynamic>{
-            'userDocId': userData.getUserDocId(),
-            'lat': userData.getLat(),
-            'lng': userData.getLng()
-          });
     }
   }
 }

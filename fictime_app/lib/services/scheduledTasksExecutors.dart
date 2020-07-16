@@ -10,10 +10,12 @@ const String lngField = 'lng';
 const int distanceAreaInMeters = 100;
 
 Future<HistoricalEntry> _getRegistByDate(String userDocId, DateTime date) async{
-  DateTime dateToCompare = DateTime(date.year, date.month, date.day);
+  DateTime startDate = DateTime(date.year, date.month, date.day);
+  DateTime endDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
   HistoricalEntry result;
   await Firestore.instance.collection('historicals').where("user", isEqualTo: userDocId)
-      .where("date", isEqualTo: dateToCompare)
+      .where("date", isGreaterThanOrEqualTo: startDate)
+      .where("date", isLessThan: endDate)
       .getDocuments()
       .then((QuerySnapshot snapshot) => {
     snapshot.documents.forEach((f) {
@@ -32,6 +34,7 @@ Future<HistoricalEntry> _getRegistByDate(String userDocId, DateTime date) async{
     bool canRegistStart = todayRegist == null || (todayRegist.getStart().isEmpty && todayRegist.getEnd().isEmpty);
     bool isInsideArea = await _isInsideArea(inputData[latField], inputData[lngField]);
     if (canRegistStart && isInsideArea) {
+      print("NOTIFICANDO START");
       startNotification(flutterLocalNotificationsPlugin, userDocId);
     }
   }
@@ -58,6 +61,7 @@ Future<HistoricalEntry> _getRegistByDate(String userDocId, DateTime date) async{
     bool canRegistEnd = todayRegist == null || (todayRegist.getStart().isNotEmpty && todayRegist.getEnd().isEmpty);
     bool isOutsideArea = await _isOutsideArea(inputData[latField], inputData[lngField]);
     if (canRegistEnd && isOutsideArea) {
+      print("NOTIFICANDO END");
       endNotification(flutterLocalNotificationsPlugin, userDocId);
     }
   }

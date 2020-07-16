@@ -58,15 +58,25 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   Future<void> _addCoordinates(UserData userData, String officeDocId) async{
-    return await firestore.collection('offices').document(officeDocId).get().then((officeDoc) =>
-        userData.updateCoordinates(officeDoc.data["coordinates"]["lat"], officeDoc.data["coordinates"]["lng"])
-    );
+    var document = firestore.collection('offices').document(officeDocId);
+    await document.get().then((officeDoc) {
+      if (officeDoc.exists){
+        userData.updateCoordinates(officeDoc.data["coordinates"]["lat"], officeDoc.data["coordinates"]["lng"]);
+      }
+    }).catchError((onError) {
+      print("ERROR " + onError);
+    });
   }
 
   Future<void> _addWorkShift(UserData userData, String workShiftId) async {
-    return await firestore.collection('workShifts').document(workShiftId).get().then((workShiftDoc) =>
-        userData.updateWorkShift(workShiftDoc.data["startTime"], workShiftDoc.data["endTime"])
-    );
+    var document = firestore.collection('workShifts').document(workShiftId);
+    await document.get().then((workShiftDoc) {
+      if (workShiftDoc.exists){
+        userData.updateWorkShift(workShiftDoc.data["startTime"], workShiftDoc.data["endTime"]);
+      }
+    }).catchError((onError) {
+      print("ERROR " + onError);
+    });
   }
 
   Future<String> getUserDocId(String email) async {
@@ -132,10 +142,12 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
 
   @override
   Future<HistoricalEntry> getRegistByDate(String userDocId, DateTime date) async{
-    DateTime dateToCompare = DateTime(date.year, date.month, date.day);
+    DateTime startDate = DateTime(date.year, date.month, date.day);
+    DateTime endDate = DateTime(date.year, date.month, date.day, 23, 59, 59);
     HistoricalEntry result;
     await firestore.collection('historicals').where("user", isEqualTo: userDocId)
-        .where("date", isEqualTo: dateToCompare)
+        .where("date", isGreaterThanOrEqualTo: startDate)
+        .where("date", isLessThan: endDate)
         .getDocuments()
         .then((QuerySnapshot snapshot) => {
       snapshot.documents.forEach((f) {

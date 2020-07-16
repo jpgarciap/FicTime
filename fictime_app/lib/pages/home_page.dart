@@ -4,9 +4,12 @@ import 'package:fictime/services/authentication.dart';
 import 'package:fictime/utils/colors.dart';
 import 'package:fictime/services/firestoreService.dart';
 import 'package:fictime/model/historicalEntry.dart';
+import 'package:fictime/model/userData.dart';
+import 'package:fictime/model/ScheduledTaskType.dart';
 import 'package:fictime/utils/historicaUtils.dart';
 import 'package:fictime/pages/incidence_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:workmanager/workmanager.dart';
 import 'dart:async';
 
 
@@ -31,6 +34,8 @@ class _HomePageState extends State<HomePage> {
   List<HistoricalEntry> _registers = new List<HistoricalEntry>();
   RefreshController _refreshController = RefreshController(initialRefresh: false);
   String _userDocId;
+  String _email;
+  UserData _userData;
   bool _isLoading;
   bool _hasStartToday;
   bool _hasEndToday;
@@ -43,8 +48,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<HistoricalEntry>> findHistoricals() async {
-    String email = await widget.auth.getEmail();
-    _userDocId = await widget.firestoreService.getUserDocId(email);
+    _email = await widget.auth.getEmail();
+    _userDocId = await widget.firestoreService.getUserDocId(_email);
     return await widget.firestoreService.getHistoricals(_userDocId);
   }
 
@@ -85,6 +90,16 @@ class _HomePageState extends State<HomePage> {
     _hasStartToday = HistoricalUtils.hasStartToday(historicals);
     _hasEndToday = HistoricalUtils.hasEndToday(historicals);
     _showCircularProgress(false);
+
+    widget.firestoreService.getUserData(_email).then((currentUserData) {
+      if (!(currentUserData == _userData)){
+        Workmanager.cancelAll().then((value){
+          initReminderStartTasks(currentUserData);
+          initReminderEndTasks(currentUserData);
+          _userData = currentUserData;
+        });
+      }
+    });
 
     return new Container(
         padding: EdgeInsets.all(16.0),
@@ -268,6 +283,40 @@ class _HomePageState extends State<HomePage> {
       height: 0.0,
       width: 0.0,
     );
+  }
+
+  void initReminderStartTasks(UserData userData) async{
+    int taskIndex = 0;
+    for (int delay
+    in userData.calculateStartDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+      await Workmanager.registerPeriodicTask(
+          "start-" + taskIndex.toString(), START_REMINDER,
+          frequency: Duration(hours: 24),
+          initialDelay: Duration(seconds: delay),
+          constraints: Constraints(networkType: NetworkType.connected),
+          inputData: <String, dynamic>{
+            'userDocId': userData.getUserDocId(),
+            'lat': userData.getLat(),
+            'lng': userData.getLng()
+          });
+      taskIndex++;
+    }
+  }
+
+  void initReminderEndTasks(UserData userData) async {
+    int taskIndex = 0;
+    for (int delay
+    in userData.calculateEndDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+      await Workmanager.registerPeriodicTask("end-" + taskIndex.toString(), END_REMINDER,
+          frequency: Duration(hours: 24),
+          initialDelay: Duration(seconds: delay),
+          constraints: Constraints(networkType: NetworkType.connected),
+          inputData: <String, dynamic>{
+            'userDocId': userData.getUserDocId(),
+            'lat': userData.getLat(),
+            'lng': userData.getLng()
+          });
+    }
   }
 
 }

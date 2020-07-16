@@ -27,6 +27,7 @@ class _IncidencePageState extends State<IncidencePage> {
   @override
   void initState() {
     super.initState();
+    selectedCheckBox = "";
     _errorMessage = "";
     _isLoading = false;
   }
@@ -102,7 +103,9 @@ class _IncidencePageState extends State<IncidencePage> {
                   "Start",
                   "End",
                 ],
-                onSelected: (String selected) => selectedCheckBox = selected)
+                onSelected: (String selected) => setState(() {
+                  selectedCheckBox = selected;
+                }))
         )
     );
   }
@@ -160,7 +163,7 @@ class _IncidencePageState extends State<IncidencePage> {
       setState(() {
         _errorMessage = "The date cannot be later than today";
       });
-    } else if (selectedCheckBox == "") {
+    } else if (selectedCheckBox.isEmpty) {
       setState(() {
         _errorMessage = "You must select start/end";
       });
