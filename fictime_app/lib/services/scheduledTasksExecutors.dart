@@ -7,7 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 const String userDocIdField = 'userDocId';
 const String latField = 'lat';
 const String lngField = 'lng';
-const int distanceAreaInMeters = 100;
+const int distanceAreaInMeters = 400;
 
 Future<HistoricalEntry> _getRegistByDate(String userDocId, DateTime date) async{
   DateTime startDate = DateTime(date.year, date.month, date.day);
@@ -34,7 +34,6 @@ Future<HistoricalEntry> _getRegistByDate(String userDocId, DateTime date) async{
     bool canRegistStart = todayRegist == null || (todayRegist.getStart().isEmpty && todayRegist.getEnd().isEmpty);
     bool isInsideArea = await _isInsideArea(inputData[latField], inputData[lngField]);
     if (canRegistStart && isInsideArea) {
-      print("NOTIFICANDO START");
       startNotification(flutterLocalNotificationsPlugin, userDocId);
     }
   }
@@ -58,10 +57,9 @@ Future<HistoricalEntry> _getRegistByDate(String userDocId, DateTime date) async{
     }
     String userDocId = inputData[userDocIdField];
     HistoricalEntry todayRegist = await _getRegistByDate(userDocId, DateTime.now());
-    bool canRegistEnd = todayRegist == null || (todayRegist.getStart().isNotEmpty && todayRegist.getEnd().isEmpty);
+    bool canRegistEnd = todayRegist != null && (todayRegist.getStart().isNotEmpty && todayRegist.getEnd().isEmpty);
     bool isOutsideArea = await _isOutsideArea(inputData[latField], inputData[lngField]);
     if (canRegistEnd && isOutsideArea) {
-      print("NOTIFICANDO END");
       endNotification(flutterLocalNotificationsPlugin, userDocId);
     }
   }
