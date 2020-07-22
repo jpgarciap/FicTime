@@ -20,14 +20,14 @@ class _IncidencePageState extends State<IncidencePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _errorMessage;
   bool _isLoading;
-  String selectedDateStr;
-  DateTime selectedDate;
-  String selectedCheckBox;
+  String _selectedDateStr;
+  DateTime _selectedDate;
+  String _selectedCheckBox;
 
   @override
   void initState() {
     super.initState();
-    selectedCheckBox = "";
+    _selectedCheckBox = "";
     _errorMessage = "";
     _isLoading = false;
   }
@@ -74,7 +74,7 @@ class _IncidencePageState extends State<IncidencePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Icon(Icons.date_range, color: Colors.black, size: 36.0),
-                  Text(selectedDateStr == null ? " Select date" : selectedDateStr,
+                  Text(_selectedDateStr == null ? " Select date" : _selectedDateStr,
                       style: new TextStyle(fontSize: 25.0, color: Colors.black))
                 ]),
             onPressed: () {
@@ -83,8 +83,8 @@ class _IncidencePageState extends State<IncidencePage> {
                   minTime: DateTime(2018, 3, 5),
                   maxTime: DateTime(2019, 6, 7), onChanged: (date) {
                     setState(() {
-                      selectedDateStr = DateFormat('dd/MM/yyyy - HH:mm').format(date);
-                      selectedDate = date;
+                      _selectedDateStr = DateFormat('dd/MM/yyyy - HH:mm').format(date);
+                      _selectedDate = date;
                     });
                   }, currentTime: DateTime.now(), locale: LocaleType.en);
             },
@@ -104,7 +104,7 @@ class _IncidencePageState extends State<IncidencePage> {
                   "End",
                 ],
                 onSelected: (String selected) => setState(() {
-                  selectedCheckBox = selected;
+                  _selectedCheckBox = selected;
                 }))
         )
     );
@@ -155,15 +155,15 @@ class _IncidencePageState extends State<IncidencePage> {
   }
 
   void validateAndSubmit() {
-    if (selectedDate == null) {
+    if (_selectedDate == null) {
       setState(() {
         _errorMessage = "You must select a date";
       });
-    } else if (selectedDate.isAfter(DateTime.now())) {
+    } else if (_selectedDate.isAfter(DateTime.now())) {
       setState(() {
         _errorMessage = "The date cannot be later than today";
       });
-    } else if (selectedCheckBox.isEmpty) {
+    } else if (_selectedCheckBox.isEmpty) {
       setState(() {
         _errorMessage = "You must select start/end";
       });
@@ -176,7 +176,7 @@ class _IncidencePageState extends State<IncidencePage> {
     setState(() {
       _isLoading = true;
     });
-    HistoricalEntry entry = await widget.firestoreService.getRegistByDate(widget.userDocId, selectedDate);
+    HistoricalEntry entry = await widget.firestoreService.getRegistByDate(widget.userDocId, _selectedDate);
     if (entry == null) {
       addnewRegist();
       successRegist();
@@ -189,17 +189,17 @@ class _IncidencePageState extends State<IncidencePage> {
   }
 
   void successRegist(){
-    selectedDate = null;
-    selectedDateStr = null;
+    _selectedDate = null;
+    _selectedDateStr = null;
     _showAlert("The incidence was registered");
   }
 
   void updateRegist(HistoricalEntry entry) async {
-    if ((selectedCheckBox == "Start" && entry.getStart().isNotEmpty) ||
-        selectedCheckBox == "End" && entry.getEnd().isNotEmpty) {
+    if ((_selectedCheckBox == "Start" && entry.getStart().isNotEmpty) ||
+        _selectedCheckBox == "End" && entry.getEnd().isNotEmpty) {
       _errorMessage = "You already have a registration for this day";
     } else {
-      if (selectedCheckBox == "Start") {
+      if (_selectedCheckBox == "Start") {
         await widget.firestoreService.updateRegistWithStart(
             entry.getDocId(), getSelectedHour());
       } else {
@@ -211,15 +211,15 @@ class _IncidencePageState extends State<IncidencePage> {
   }
 
   String getSelectedHour() {
-    return DateFormat('HH:mm').format(selectedDate);
+    return DateFormat('HH:mm').format(_selectedDate);
   }
 
   void addnewRegist() async {
-    if (selectedCheckBox == "Start") {
+    if (_selectedCheckBox == "Start") {
       await widget.firestoreService.addNewStartWithDate(
-          widget.userDocId, selectedDate);
+          widget.userDocId, _selectedDate);
     } else {
-      await widget.firestoreService.addNewEndWithDate(widget.userDocId, selectedDate);
+      await widget.firestoreService.addNewEndWithDate(widget.userDocId, _selectedDate);
     }
   }
 

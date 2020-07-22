@@ -33,17 +33,20 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   List<HistoricalEntry> _registers = new List<HistoricalEntry>();
   RefreshController _refreshController = RefreshController(initialRefresh: false);
+  TextEditingController _commentController = new TextEditingController();
   String _userDocId;
   String _email;
   UserData _userData;
   bool _isLoading;
   bool _hasStartToday;
   bool _hasEndToday;
+  String _comment;
 
   @override
   void initState() {
     super.initState();
     _isLoading = false;
+    _comment = "";
     findHistoricals();
   }
 
@@ -110,6 +113,7 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               _registerButtons(),
               _showCircularProgress(false),
+              _showCommentInput(),
               _table(),
               _incidenceButton()
             ],
@@ -129,6 +133,27 @@ class _HomePageState extends State<HomePage> {
                 ]
             )
         )
+    );
+  }
+
+  Widget _showCommentInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: new TextFormField(
+        key: Key("comment-field"),
+        maxLength: 50,
+        maxLines: 1,
+        controller: _commentController,
+        keyboardType: TextInputType.text,
+        autofocus: false,
+        decoration: new InputDecoration(
+            hintText: 'Comment',
+            icon: new Icon(
+              Icons.description,
+              color: Colors.grey,
+            )),
+        onChanged: (value) => setState(() { _comment = value.trim(); }),
+      ),
     );
   }
 
@@ -153,20 +178,24 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = true;
     });
-    await widget.firestoreService.registStart(_userDocId, _registers);
+    await widget.firestoreService.registStart(_userDocId, _comment, _registers);
     setState(() {
       _isLoading = false;
+      _comment = '';
     });
+    _commentController.clear();
   }
 
   void registEnd() async{
     setState(() {
       _isLoading = true;
     });
-    await widget.firestoreService.registEnd(_userDocId, _registers);
+    await widget.firestoreService.registEnd(_userDocId, _comment, _registers);
     setState(() {
       _isLoading = false;
+      _comment = '';
     });
+    _commentController.clear();
   }
 
   Widget endButton(){
@@ -188,7 +217,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _table() {
     return new Padding(
-        padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
+        padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
         child:
           DataTable(columns: const <DataColumn>[
             DataColumn(
@@ -241,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Icon(Icons.notifications, color: Colors.black, size: 36.0),
-                  Text(' Incidence', style: new TextStyle(fontSize: 25.0, color: Colors.black))
+                  Text(' Regist other day', style: new TextStyle(fontSize: 25.0, color: Colors.black))
                 ]
             ),
             onPressed: pushIncidence,

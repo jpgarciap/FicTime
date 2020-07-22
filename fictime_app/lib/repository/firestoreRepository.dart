@@ -8,12 +8,12 @@ abstract class FirestoreRepository {
   Future<List<HistoricalEntry>> getHistoricals(String userDocId);
   Future<String> getUserDocId(String email);
   Future<UserData> getUserData(String email);
-  Future<void> addNewStart(String userDocId);
-  Future<void> addNewEnd(String userDocId);
+  Future<void> addNewStart(String userDocId, String comment);
+  Future<void> addNewEnd(String userDocId, String comment,);
   Future<void> addNewStartWithDate(String userDocId, DateTime dateTime);
   Future<void> addNewEndWithDate(String userDocId,  DateTime dateTime);
-  Future<void> updateTodayStart(String historicalDocId);
-  Future<void> updateTodayEnd(String historicalDocId);
+  Future<void> updateTodayStart(String historicalDocId, String comment);
+  Future<void> updateTodayEnd(String historicalDocId, String comment,);
   Future<void> updateRegistWithEnd(String historicalDocId, String hour);
   Future<void> updateRegistWithStart(String historicalDocId, String hour);
   Future<HistoricalEntry> getRegistByDate(String userDocId, DateTime date);
@@ -28,7 +28,7 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
     final List<HistoricalEntry> result = new List<HistoricalEntry>();
     await firestore.collection('historicals').where("user", isEqualTo: userDocId)
         .orderBy("date", descending: true)
-        .limit(7)
+        .limit(5)
         .getDocuments()
         .then((QuerySnapshot snapshot) => {
       snapshot.documents.forEach((f) {
@@ -90,8 +90,8 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   @override
-  Future<void> addNewEnd(String userDocId) async {
-    return firestore.collection('historicals').document().setData({"date": getDate(), "user": userDocId, "end": getHour()});
+  Future<void> addNewEnd(String userDocId, String comment) async {
+    return firestore.collection('historicals').document().setData({"date": getDate(), "user": userDocId, "end": getHour(), "commentEnd": comment});
   }
 
   @override
@@ -110,8 +110,8 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   @override
-  Future<void> addNewStart(String userDocId) async{
-    return firestore.collection('historicals').document().setData({"date": getDate(), "user": userDocId, "start": getHour()});
+  Future<void> addNewStart(String userDocId, String comment) async{
+    return firestore.collection('historicals').document().setData({"date": getDate(), "user": userDocId, "start": getHour(), "commentStart": comment});
   }
 
   @override
@@ -121,13 +121,13 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   @override
-  Future<void> updateTodayEnd(String historicalDocId) {
-    return firestore.collection('historicals').document(historicalDocId).updateData({"end": getHour()});
+  Future<void> updateTodayEnd(String historicalDocId, String comment) {
+    return firestore.collection('historicals').document(historicalDocId).updateData({"end": getHour(), "commentEnd": comment});
   }
 
   @override
-  Future<void> updateTodayStart(String historicalDocId) {
-    return firestore.collection('historicals').document(historicalDocId).updateData({"start": getHour()});
+  Future<void> updateTodayStart(String historicalDocId, String comment) {
+    return firestore.collection('historicals').document(historicalDocId).updateData({"start": getHour(), "commentStart" : comment});
   }
 
   @override

@@ -8,8 +8,8 @@ abstract class FirestoreService {
   Future<List<HistoricalEntry>> getHistoricals(String userDocId);
   Future<String> getUserDocId(String email);
   Future<UserData> getUserData(String email);
-  Future<void> registStart(String userDocId, List<HistoricalEntry> historicals);
-  Future<void> registEnd(String userDocId, List<HistoricalEntry> historicals);
+  Future<void> registStart(String userDocId, String comment, List<HistoricalEntry> historicals);
+  Future<void> registEnd(String userDocId, String comment, List<HistoricalEntry> historicals);
   Future<void> addNewStartWithDate(String userDocId, DateTime dateTime);
   Future<void> addNewEndWithDate(String userDocId,  DateTime dateTime);
   Future<void> updateRegistWithEnd(String historicalDocId, String hour);
@@ -38,22 +38,22 @@ class FirestoreServiceImpl implements FirestoreService {
   }
 
   @override
-  Future<void> registStart(String userDocId, List<HistoricalEntry> historicals) async {
+  Future<void> registStart(String userDocId, String comment, List<HistoricalEntry> historicals) async {
     HistoricalEntry todayEntry = HistoricalUtils.todayEntry(historicals);
     if (todayEntry == null) {
-      await repository.addNewStart(userDocId);
+      await repository.addNewStart(userDocId, comment);
     } else{
-      await repository.updateTodayStart(todayEntry.getDocId());
+      await repository.updateTodayStart(todayEntry.getDocId(), comment);
     }
   }
 
   @override
-  Future<void> registEnd(String userDocId, List<HistoricalEntry> historicals) async {
+  Future<void> registEnd(String userDocId, String comment, List<HistoricalEntry> historicals) async {
     HistoricalEntry todayEntry = HistoricalUtils.todayEntry(historicals);
     if (todayEntry == null) {
-      await repository.addNewEnd(userDocId);
+      await repository.addNewEnd(userDocId, comment);
     } else{
-      await repository.updateTodayEnd(todayEntry.getDocId());
+      await repository.updateTodayEnd(todayEntry.getDocId(), comment);
     }
   }
 
