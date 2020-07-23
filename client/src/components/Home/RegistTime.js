@@ -42,9 +42,9 @@ const StyledTableCell = withStyles((theme) => ({
   
 const styles = Utils.registTime;
 
-function createData(dateWithoutFormat, start, end) {
+function createData(dateWithoutFormat, start, end, commentStart, commentEnd) {
   var date = convertDate(dateWithoutFormat);
-  return { date, start, end};
+  return { date, start, end, commentStart, commentEnd};
 }
 
 function convertDate(date) {
@@ -81,13 +81,23 @@ class RegistTimeBase extends React.Component {
         disableStart : true,
         disableEnd: true
       },
+      width: 0,
       userDocId: null,
       historicalTodayDocId: null
     };
   }
 
   componentDidMount() {
+    window.addEventListener('resize', this.updateDimensions);
     this.loadData();
+  }
+
+  updateDimensions = () => {
+    this.setState({ width: window.innerWidth });
+  };
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateDimensions);
   }
 
   loadData(){
@@ -116,7 +126,7 @@ class RegistTimeBase extends React.Component {
                       actionBtns.disableEnd = (data.end != null);
                       historicalTodayDocId = historicalDoc.id;
                     }
-                    var row = createData(data.date.toDate(), data.start, data.end);
+                    var row = createData(data.date.toDate(), data.start, data.end, data.commentStart, data.commentEnd);
                     result.push(row);
                 })
                 this.setState({ rows: result, actionBtns: actionBtns, userDocId: userDoc.id, historicalTodayDocId: historicalTodayDocId });
@@ -217,16 +227,18 @@ class RegistTimeBase extends React.Component {
                             <StyledTableCell>Date</StyledTableCell>
                             <StyledTableCell align="right">Start</StyledTableCell>
                             <StyledTableCell align="right">End</StyledTableCell>
+                            {this.state.width >= 760 ? <StyledTableCell align="center">Comments</StyledTableCell>: null}
                         </TableRow>
                         </TableHead>
                         <TableBody>
                         {this.state.rows.map((row) => (
                             <StyledTableRow key={row.date}>
-                            <StyledTableCell component="th" scope="row">
-                                {row.date}
-                            </StyledTableCell>
-                            <StyledTableCell align="right">{row.start}</StyledTableCell>
-                            <StyledTableCell align="right">{row.end}</StyledTableCell>
+                              <StyledTableCell component="th" scope="row">
+                                  {row.date}
+                              </StyledTableCell>
+                              <StyledTableCell align="right">{row.start}</StyledTableCell>
+                              <StyledTableCell align="right">{row.end}</StyledTableCell>
+                              {this.state.width >= 760 ? <StyledTableCell align="center">{row.commentStart}{row.commentStart != null && row.commentStart.length > 0 ? "\n" : null}{row.commentEnd}</StyledTableCell>: null}
                             </StyledTableRow>
                         ))}
                         </TableBody>

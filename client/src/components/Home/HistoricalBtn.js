@@ -81,7 +81,10 @@ class HistoricalBtnBase extends React.Component {
         var date = historical.date == null ? "" : convertDate(historical.date.toDate());
         var start = historical.start == null ? "" : historical.start;
         var end = historical.end == null ? "" : historical.end;
-        return [ date, start, end];
+        var startComment = historical.commentStart == null ? "" : historical.commentStart;
+        var endComment = historical.commentEnd == null ? "" : historical.commentEnd;
+        var comment = startComment !== "" ? startComment + "\n" + endComment : endComment;
+        return [ date, start, end, comment ];
     }
 
 
@@ -92,7 +95,7 @@ class HistoricalBtnBase extends React.Component {
         
         doc.autoTable({
             headStyles: { fillColor: COLORS.WATERMELON },
-            head: [['Date', 'Start', 'End']],
+            head: [['Date', 'Start', 'End', 'Comments']],
             body: data,
         })
         
