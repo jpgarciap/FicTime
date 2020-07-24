@@ -11,6 +11,7 @@ import { AuthContext } from '../Firebase/context';
 import { app } from '../Firebase/firebase';
 import Grid from '@material-ui/core/Grid';
 import AdminSlide from './adminslide';
+import logo from '../../resources/logos/logo_horizontal.png';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -23,6 +24,9 @@ const useStyles = makeStyles((theme) =>
     },
     adminmode: {
       flexGrow: 1,
+    },
+    logo: {
+      maxWidth: 100,
     },
   }),
 );
@@ -58,13 +62,9 @@ export default function Navigation() {
         <Toolbar>
           <Grid justify="space-between" container>
             <Grid item>
-              <div>
-                <Typography variant="h6" className={classes.title}>
-                  <Link to={ROUTES.LANDING} style={{color: COLORS.CARBON}}>
-                    FicTime
-                  </Link>
-                </Typography>
-              </div>
+              <Link to={ROUTES.LANDING}>
+                <img src={logo} alt="logo" className={classes.logo} href={ROUTES.LANDING}/>
+              </Link>
             </Grid>
             <Grid item>
                 { isAdmin ? <AdminSlide className={classes.adminmode}></AdminSlide> : null}                
