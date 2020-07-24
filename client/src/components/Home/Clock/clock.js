@@ -7,12 +7,12 @@ export default class MyClock extends React.Component {
     return (
         <div>
             <ReactAwesomeClock
-                clockSeparator= ":"
+                clockSeparator= "."
                 style={{
                     color: "grey",
-                    fontSize: 60,
-                    textShadow: "0 0 10px grey",
-                    fontFamily: "aerial"
+                    fontSize: 45,
+                    textShadow: "0 0 5px grey",
+                    fontFamily: "Trebuchet MS"
                 }}
             />
 

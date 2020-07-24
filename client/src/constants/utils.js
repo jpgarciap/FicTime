@@ -54,6 +54,9 @@ export const registTime = theme => ({
   },
   container: {
     textAlign: "center",
+  },
+  vertically: {
+    marginTop: '15%',
   }
 });
 
