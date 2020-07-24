@@ -113,7 +113,7 @@ class HistoricalBtnBase extends React.Component {
         const { open } = this.state;
 
         return(
-            <div>
+            <container>
                 <GreyButton variant="contained" startIcon={<ImportExportIcon />} size="large" color="primary" onClick={this.handleClickOpen} className={classes.margin}>
                     Export Historical
                 </GreyButton>
@@ -156,7 +156,7 @@ class HistoricalBtnBase extends React.Component {
                         </Button>
                     </DialogActions>
                 </Dialog>    
-            </div>
+            </container>
         )
     }
 

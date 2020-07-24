@@ -20,6 +20,8 @@ import HistoricalBtn from './HistoricalBtn';
 import { GreenButton } from '../../constants/buttons';
 import MyClock from './Clock/clock';
 import Grid from '@material-ui/core/Grid';
+import InsertCommentIcon from '@material-ui/icons/InsertComment';
+import TextField from '@material-ui/core/TextField';
 
 
 const StyledTableCell = withStyles((theme) => ({
@@ -82,6 +84,7 @@ class RegistTimeBase extends React.Component {
         disableEnd: true
       },
       width: 0,
+      comment: '',
       userDocId: null,
       historicalTodayDocId: null
     };
@@ -89,6 +92,7 @@ class RegistTimeBase extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.updateDimensions);
+    this.updateDimensions();
     this.loadData();
   }
 
@@ -138,43 +142,55 @@ class RegistTimeBase extends React.Component {
 
 
   onStart = () => {
-    const { userDocId, historicalTodayDocId } = this.state;
+    const { userDocId, historicalTodayDocId, comment } = this.state;
     var time = getTime();
     if (historicalTodayDocId == null){
       var historical = {
         date: new Date(getTodayDateformat()),
         user: userDocId,
-        start: time
+        start: time, 
+        commentStart: comment
       };
       this.addHistorical(historical);
     } else{
       var updateData = {
-        start: time
+        start: time,
+        commentStart: comment
       }
       this.updateHistorical(historicalTodayDocId, updateData);
     }
     this.loadData();
+    this.setState({comment: ""})
     this.forceUpdate();
   };
 
+  onChange = event => {
+    this.setState({
+       [event.target.name] : event.target.value
+      });
+  };
+
   onEnd = () => {
-    const { userDocId, historicalTodayDocId } = this.state;
+    const { userDocId, historicalTodayDocId, comment } = this.state;
     var time = getTime();
 
     if (historicalTodayDocId == null){
       var historical = {
         date: new Date(getTodayDateformat()),
         user: userDocId,
-        end: time
+        end: time,
+        commentEnd: comment
       };
       this.addHistorical(historical);
     } else{
       var updateData = {
-        end: time
+        end: time,
+        commentEnd: comment
       }
       this.updateHistorical(historicalTodayDocId, updateData);
     }
     this.loadData();
+    this.setState({comment: ""})
     this.forceUpdate();
   }
 
@@ -216,7 +232,19 @@ class RegistTimeBase extends React.Component {
               <Button variant="contained" startIcon={<ExitToAppIcon />} size="large" color="primary" onClick={this.onEnd} className={classes.margin} disabled={actionBtns.disableEnd}>End</Button>
           </div>
           <div>
-              <IncidenceBtn userDocId={this.state.userDocId}/>
+            <Grid container spacing={1} justify="center" alignItems="flex-end">
+              <Grid item>
+                <InsertCommentIcon />
+              </Grid>
+              <Grid item>
+                <TextField id = "comment"
+                name="comment"
+                label = "Comment"
+                value = {this.state.comment}
+                onChange = {this.onChange}
+                inputProps={{ maxLength: 50 }} />
+              </Grid>
+            </Grid>
           </div>
           <div>
               { this.state.rows.length > 0 &&
@@ -247,7 +275,8 @@ class RegistTimeBase extends React.Component {
               }
           </div>
           <div>
-              <HistoricalBtn userDocId={this.state.userDocId}/>
+              <IncidenceBtn variant="contained" userDocId={this.state.userDocId} className={classes.margin}/>
+              <HistoricalBtn variant="contained" userDocId={this.state.userDocId} className={classes.margin}/>
           </div>          
 
       </div>

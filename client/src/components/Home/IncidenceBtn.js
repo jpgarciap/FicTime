@@ -128,9 +128,9 @@ class IncidenceBtnBase extends React.Component {
         const { open } = this.state;
         const today = new Date();
         return(
-            <div>
+            <container>
                 <YellowButton variant="contained" startIcon={<NotificationImportantRoundedIcon />} size="large" color="primary" onClick={this.handleClickOpen} className={classes.margin}>
-                    Regist other day
+                    Forgotten Registers
                 </YellowButton>
                 <Dialog open={open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
                     {this.state.showAlert && 
@@ -139,7 +139,7 @@ class IncidenceBtnBase extends React.Component {
                             you have already registered this day
                         </Alert>
                     }
-                    <DialogTitle id="form-dialog-title">Regist other day</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Forgotten Registers</DialogTitle>
                     <DialogContent>
                         <form className={classes.container}>
                             <TextField
@@ -194,7 +194,7 @@ class IncidenceBtnBase extends React.Component {
                         </Button>
                     </DialogActions>
                 </Dialog>
-            </div>
+            </container>
         )
     }
 
