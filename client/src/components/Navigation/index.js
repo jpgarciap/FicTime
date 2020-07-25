@@ -5,7 +5,6 @@ import * as COLORS from '../../constants/colors';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { AuthContext } from '../Firebase/context';
 import { app } from '../Firebase/firebase';
@@ -58,12 +57,12 @@ export default function Navigation() {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static" style={{backgroundColor: 'white'}}>
+      <AppBar style={{backgroundColor: 'white'}}>
         <Toolbar>
           <Grid justify="space-between" container>
             <Grid item>
               <Link to={ROUTES.LANDING}>
-                <img src={logo} alt="logo" className={classes.logo} href={ROUTES.LANDING}/>
+                <img src={logo} alt="logo" className={classes.logo}/>
               </Link>
             </Grid>
             <Grid item>

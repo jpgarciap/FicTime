@@ -231,7 +231,7 @@ class RegistTimeBase extends React.Component {
           </Grid>
         </div>
         :
-        <div className={classes.container}>
+        <div className={classes.clock}>
           <Grid container justify="center" alignItems="center">
             <Grid item xs={5}>
               <MyClock />
