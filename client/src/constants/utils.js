@@ -3,7 +3,7 @@ import * as COLORS from '../constants/colors.js'
 
 export const formStyles = theme => ({
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(15),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -117,7 +117,8 @@ export const navigation = theme => ({
 
 export const welcome = theme => ({
   container: {
-    margin: theme.spacing(10),
+    margin: theme.spacing(8),
+    marginTop: theme.spacing(20),
     textAlign: "center",
   },
   title: {

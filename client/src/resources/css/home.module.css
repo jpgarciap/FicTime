@@ -3,7 +3,6 @@ html, #app, #app>div {
 }
 
 body {
-  height:100vh;
   background-color: #EFEFEF;
 }
 
@@ -35,4 +34,5 @@ body {
   margin-right: auto;
   text-align: center;
 }
+
 

@@ -28,40 +28,38 @@ const theme = createMuiTheme({
   },
 });
 
-class App extends Component{
+class App extends Component {
 
-  render(){
+  render() {
     return (
-      <div>
+      <container className={styles.wrapper}>
         <AuthProvider>
           <ThemeProvider theme={theme}>
             <Router>
-              <div className={styles.wrapper}>
-                <Navigation />
-                <Route exact path={ROUTES.LANDING} component={HomePage}/>
-                <Route path={ROUTES.HOME} component={HomePage}/>
-                <Route path={ROUTES.SIGN_IN} component={SignInPage}/>
-                <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage}/>
-                <Route path={ROUTES.SIGN_UP} component={SignUpPage}/>
-                <RouteAdmin path={ROUTES.ADMIN}>
-                  <Dashboard></Dashboard>  
-                </RouteAdmin>
-                <Footer>
-                  <Grid container direction="row" alignItems="center" justify="center">
-                    {window.innerWidth > 760 ? <Grid item xs/> : null}
-                    <Grid item xs style={{textAlign: 'center'}}>
-                      <strong style={{textAlign: 'center'}}>Master Universitario en Ingeniería informática</strong>
-                    </Grid>
-                    <Grid item xs style={{textAlign: 'center'}}>
-                      <img src={logoUdc} alt="logo" style={{ maxWidth: 170}}/>
-                    </Grid>
+              <Navigation />
+              <Route exact path={ROUTES.LANDING} component={HomePage} />
+              <Route path={ROUTES.HOME} component={HomePage} />
+              <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+              <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
+              <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
+              <RouteAdmin path={ROUTES.ADMIN}>
+                <Dashboard></Dashboard>
+              </RouteAdmin>
+              <Footer>
+                <Grid container direction="row" alignItems="center" justify="center">
+                  {window.innerWidth > 760 ? <Grid item xs /> : null}
+                  <Grid item xs style={{ textAlign: 'center' }}>
+                    <strong style={{ textAlign: 'center' }}>Master Universitario en Ingeniería informática</strong>
                   </Grid>
-                </Footer>
-              </div>
+                  <Grid item xs style={{ textAlign: 'center' }}>
+                    <img src={logoUdc} alt="logo" style={{ maxWidth: 170 }} />
+                  </Grid>
+                </Grid>
+              </Footer>
             </Router>
           </ThemeProvider>
         </AuthProvider>
-      </div>
+      </container>
     )
   }
 }

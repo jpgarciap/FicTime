@@ -4,7 +4,7 @@ const footerStyle = {
   backgroundColor: "white",
   color: "black",
   borderTop: "1px solid #E7E7E7",
-  //textAlign: "center",
+  textAlign: "center",
   padding: "1rem",
   position: "fixed",
   left: "0",
@@ -16,7 +16,7 @@ const footerStyle = {
 
 const phantomStyle = {
   display: "block",
-  padding: "20px",
+  //padding: "20px",
   height: "60px",
   width: "100%"
 };
