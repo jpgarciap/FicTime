@@ -59,7 +59,7 @@ Future endNotification(FlutterLocalNotificationsPlugin flutterLocalNotifications
 
 Future startNotification(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, String userDocId) async {
   var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      'your channel id', 'your channel name', 'your channel description',
+      '1', 'channel', 'channel to notifications',
       playSound: true, importance: Importance.Max, priority: Priority.High);
   var iOSPlatformChannelSpecifics =
   new IOSNotificationDetails(presentSound: false);

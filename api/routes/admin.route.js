@@ -1,10 +1,10 @@
-var admin = require('firebase-admin');
+var adminSdk = require('firebase-admin');
 var serviceAccount = require("../firebase/firebase-admin.json");
 var express = require('express');
 var router = express.Router();
 
-const FirebaseAdmin = admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+const FirebaseAdmin = adminSdk.initializeApp({
+    credential: adminSdk.credential.cert(serviceAccount),
     databaseURL: "https://registration-dc367.firebaseio.com"
 })
 //Crea un  usuario

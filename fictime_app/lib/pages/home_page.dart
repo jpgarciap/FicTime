@@ -316,8 +316,7 @@ class _HomePageState extends State<HomePage> {
 
   void initReminderStartTasks(UserData userData) async{
     int taskIndex = 0;
-    for (int delay
-    in userData.calculateStartDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+    for (int delay in userData.calculateStartDelaysInSeconds(taskNumber, periodicityInMinutes)) {
       await Workmanager.registerPeriodicTask(
           "start-" + taskIndex.toString(), START_REMINDER,
           frequency: Duration(hours: 24),
@@ -334,8 +333,7 @@ class _HomePageState extends State<HomePage> {
 
   void initReminderEndTasks(UserData userData) async {
     int taskIndex = 0;
-    for (int delay
-    in userData.calculateEndDelaysInSeconds(taskNumber, periodicityInMinutes)) {
+    for (int delay in userData.calculateEndDelaysInSeconds(taskNumber, periodicityInMinutes)) {
       await Workmanager.registerPeriodicTask("end-" + taskIndex.toString(), END_REMINDER,
           frequency: Duration(hours: 24),
           initialDelay: Duration(seconds: delay),
@@ -345,6 +343,7 @@ class _HomePageState extends State<HomePage> {
             'lat': userData.getLat(),
             'lng': userData.getLng()
           });
+      taskIndex++;
     }
   }
 

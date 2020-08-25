@@ -109,4 +109,4 @@ SignUpForm.propTypes = {
 
 const SignUp = compose(withStyles(styles))(SignUpForm);
   
-  export default SignUp;
+export default SignUp;
